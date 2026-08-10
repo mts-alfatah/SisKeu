@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+      * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+      body { background-color: #f3f4f6; color: #1f2937; }
+      .header { background-color: #1e3a8a; color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
+      .container { max-width: 1000px; margin: 30px auto; padding: 0 15px; }
+      .card-box { background: white; border-radius: 10px; padding: 25px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); margin-bottom: 20px; }
+      .role-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-top: 20px; }
+      .role-card { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); text-align: center; cursor: pointer; border: 2px solid transparent; }
+      .role-card:hover { border-color: #3b82f6; }
+      .role-card i { font-size: 40px; color: #3b82f6; margin-bottom: 15px; }
+      .logout-btn { background: #ef4444; color: white; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; }
+      .badge { padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 600; }
+      .badge-lunas { background: #dcfce7; color: #166534; }
+      .badge-belum { background: #fee2e2; color: #991b1b; }
+      .hidden { display: none !important; }
+      input, select { width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #d1d5db; border-radius: 6px; }
+      .btn-primary { background: #3b82f6; color: white; border: none; padding: 10px; border-radius: 6px; width: 100%; cursor: pointer; }
+    </style>
+  </head>
+  <body>
+    <!-- HEADER -->
+    <div class="header">
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <img src="logo.png" alt="Logo" style="height: 40px; width: auto; border-radius: 4px;">
+        <h2>Sistem Pembayaran</h2>
+      </div>
+      <button id="btnKeluar" class="logout-btn hidden" onclick="prosesLogout()"><i class="fa-solid fa-right-from-bracket"></i> Keluar</button>
+    </div>
+
+    <!-- ROLE SELECTION -->
+    <div id="viewRoleSelection" class="container">
+      <h2 style="text-align: center; margin-bottom: 20px;">Pilih Akses Anda</h2>
+      <div class="role-grid">
+        <div class="role-card" onclick="pilihPeran('Siswa')"><i class="fa-solid fa-user-graduate"></i><h3>Siswa</h3></div>
+        <div class="role-card" onclick="pilihPeran('Wali Kelas')"><i class="fa-solid fa-chalkboard-user"></i><h3>Wali Kelas</h3></div>
+        <div class="role-card" onclick="pilihPeran('Admin')"><i class="fa-solid fa-user-shield"></i><h3>Admin</h3></div>
+      </div>
+    </div>
+
+    <!-- LOGIN -->
+    <div id="viewLogin" class="container hidden" style="max-width: 400px;">
+      <button onclick="kembaliKeMenu()" style="border:none; background:none; cursor:pointer; margin-bottom:10px;"><i class="fa-solid fa-arrow-left"></i> Kembali</button>
+      <div class="card-box">
+        <h3 id="labelLoginRole" style="margin-bottom:15px;">Login</h3>
+        <form onsubmit="prosesLogin(event)">
+          <input type="text" id="loginUsername" placeholder="Username / NISN" required>
+          <input type="password" id="loginPassword" placeholder="Password" required>
+          <button type="submit" class="btn-primary">Masuk</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- DASHBOARD -->
+    <div id="viewDashboard" class="container hidden">
+      <div id="userGreeting"></div>
+      <div id="viewSiswa" class="hidden">
+        <div class="card-box"><h3>Laporan Saya</h3><div id="totalSiswa"></div><table id="tblLaporanSiswa"></table></div>
+      </div>
+      <div id="viewWalikelas" class="hidden">
+        <div class="card-box"><h3>Kelas <span id="labelKelasWalikelas"></span></h3><table id="tblLaporanWalikelas"></table></div>
+      </div>
+      <div id="viewAdmin" class="hidden">
+        <div style="display:flex; gap:10px; margin-bottom:20px;">
+           <div class="card-box" style="width:100%;">Kas Bulan Ini: <div id="widgetKasBulanIni" style="font-weight:bold;">Rp 0</div></div>
+           <div class="card-box" style="width:100%;">Total Kas: <div id="widgetKasTotal" style="font-weight:bold;">Rp 0</div></div>
+        </div>
+        <div class="card-box">
+          <form onsubmit="submitTransaksi(event)">
+            <input type="text" id="inputNisn" onchange="cekNISN()" placeholder="NISN (Tekan Tab)" required>
+            <input type="text" id="inputNama" readonly placeholder="Nama Siswa">
+            <input type="text" id="inputKelas" readonly placeholder="Kelas">
+            <select id="inputJenis"><option value="SPP">SPP</option><option value="Uang Gedung">Uang Gedung</option></select>
+            <input type="number" id="inputNominal" placeholder="Nominal" required>
+            <button type="submit" class="btn-primary">Simpan Transaksi</button>
+          </form>
+        </div>
+        <input type="text" id="searchInputAdmin" onkeyup="filterTabelAdmin()" placeholder="🔍 Cari Data..." style="margin-bottom:10px;">
+        <table id="tblAdminDaftarTrx"></table>
+      </div>
+    </div>
+
+    <script>
+      const scriptUrl = "<?= ScriptApp.getService().getUrl() ?>";
+      async function apiCall(d) { return await (await fetch(scriptUrl, {method:'POST', body:JSON.stringify(d)})).json(); }
+      
+      function pilihPeran(role) { 
+        document.getElementById('viewRoleSelection').classList.add('hidden');
+        document.getElementById('viewLogin').classList.remove('hidden');
+        document.getElementById('labelLoginRole').innerText = "Login " + role;
+        document.getElementById('loginUsername').dataset.role = role; 
+      }
+      function kembaliKeMenu() { 
+        document.getElementById('viewLogin').classList.add('hidden');
+        document.getElementById('viewRoleSelection').classList.remove('hidden');
+      }
+
+      async function prosesLogin(e) {
+        e.preventDefault();
+        const res = await apiCall({action:'login', username:document.getElementById('loginUsername').value, password:document.getElementById('loginPassword').value});
+        if(res.success) { localStorage.setItem('appUser', JSON.stringify(res.user)); loadDashboard(res.user); }
+        else alert(res.message);
+      }
+
+      function loadDashboard(user) {
+        document.getElementById('viewRoleSelection').classList.add('hidden');
+        document.getElementById('viewLogin').classList.add('hidden');
+        document.getElementById('viewDashboard').classList.remove('hidden');
+        document.getElementById('btnKeluar').classList.remove('hidden');
+        if(user.role === 'Admin') { document.getElementById('viewAdmin').classList.remove('hidden'); fetchAdminTransaksi(); }
+      }
+
+      async function fetchAdminTransaksi() {
+        const res = await apiCall({action:'getAllTransaksiSiswa'});
+        document.getElementById('widgetKasBulanIni').innerText = 'Rp ' + res.totalBulanIni.toLocaleString();
+        document.getElementById('widgetKasTotal').innerText = 'Rp ' + res.totalKeseluruhan.toLocaleString();
+        let html = "<tr><th>NISN</th><th>Nama</th><th>Status</th><th>Aksi</th></tr>";
+        res.data.forEach(r => {
+           html += `<tr><td>${r.nisn}</td><td>${r.nama}</td><td>${r.status}</td><td>${r.status === 'Belum Lunas' ? `<button onclick="prosesPelunasan(${r.rowIdx})">Lunasi</button>` : 'Selesai'}</td></tr>`;
+        });
+        document.getElementById('tblAdminDaftarTrx').innerHTML = html;
+      }
+      
+      async function prosesPelunasan(rIdx) {
+        await apiCall({action:'updateStatusLunas', rowIdx:rIdx});
+        fetchAdminTransaksi();
+      }
+
+      function prosesLogout() { localStorage.clear(); location.reload(); }
+      
+      window.onload = () => { const u = localStorage.getItem('appUser'); if(u) loadDashboard(JSON.parse(u)); }
+    </script>
+  </body>
+</html>
