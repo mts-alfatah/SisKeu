@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login System</title>
+  <style>
+    body { 
+      font-family: Arial, sans-serif; 
+      display: flex; 
+      justify-content: center; 
+      align-items: center; 
+      height: 100vh; 
+      margin: 0; 
+      background-color: #f4f4f9; 
+    }
+    .card { 
+      background: white; 
+      padding: 30px; 
+      border-radius: 8px; 
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1); 
+      width: 100%; 
+      max-width: 320px; 
+    }
+    .form-group { 
+      margin-bottom: 15px; 
+    }
+    label { 
+      display: block; 
+      margin-bottom: 5px; 
+      font-weight: bold; 
+    }
+    input { 
+      width: 100%; 
+      padding: 10px; 
+      border: 1px solid #ccc; 
+      border-radius: 4px; 
+      box-sizing: border-box; 
+    }
+    button { 
+      width: 100%; 
+      padding: 10px; 
+      background-color: #007bff; 
+      color: white; 
+      border: none; 
+      border-radius: 4px; 
+      cursor: pointer; 
+      font-size: 16px; 
+    }
+    button:disabled { 
+      background-color: #aaa; 
+    }
+    #message { 
+      margin-top: 15px; 
+      text-align: center; 
+      font-size: 14px; 
+      font-weight: bold; 
+    }
+  </style>
+</head>
+<body>
+
+<div class="card">
+  <h2>Masuk Sistem</h2>
+  <form id="loginForm">
+    <div class="form-group">
+      <label for="username">ID Login</label>
+      <input type="text" id="username" required autocomplete="off">
+    </div>
+    <div class="form-group">
+      <label for="password">Password</label>
+      <input type="password" id="password" required>
+    </div>
+    <button type="submit" id="btnSubmit">Masuk</button>
+  </form>
+  <div id="message"></div>
+</div>
+
+<script>
+  // PENTING: Ganti URL di bawah ini dengan URL Web App Apps Script Anda!
+  const scriptURL = 'https://script.google.com/macros/s/AKfycbzgveAgQ9NG-hfIaOrygn7szrgnrZm9BWUORlf714qHQrEsqBHja9JT8c9vfsMrsWJEsQ/exec';
+
+  const loginForm = document.getElementById('loginForm');
+  const btnSubmit = document.getElementById('btnSubmit');
+  const messageDiv = document.getElementById('message');
+
+  loginForm.addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    btnSubmit.disabled = true;
+    messageDiv.style.color = 'blue';
+    messageDiv.textContent = 'Memeriksa kredenial...';
+
+    const payload = {
+      username: document.getElementById('username').value,
+      password: document.getElementById('password').value
+    };
+
+    // Mengirim request tanpa memicu preflight CORS
+    fetch(scriptURL, {
+      method: 'POST',
+      body: JSON.stringify(payload),
+      redirect: 'follow'
+    })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Gagal menghubungi server');
+      }
+      return response.json(); // Membaca balasan dari server
+    })
+    .then(data => {
+      btnSubmit.disabled = false;
+
+      if (data.status === 'success') {
+        messageDiv.style.color = 'green';
+        messageDiv.textContent = `Login Berhasil! Selamat datang, ${data.user.nama}`;
+        
+        // Simpan data user ke localStorage (opsional)
+        localStorage.setItem('userSession', JSON.stringify(data.user));
+
+        // Jika Anda punya halaman dashboard, aktifkan kode di bawah ini:
+        // setTimeout(() => {
+        //   window.location.href = 'dashboard.html';
+        // }, 1000);
+      } else {
+        messageDiv.style.color = 'red';
+        messageDiv.textContent = data.message; // Menampilkan pesan error dari Sheets
+      }
+    })
+    .catch(error => {
+      btnSubmit.disabled = false;
+      messageDiv.style.color = 'red';
+      messageDiv.textContent = 'Terjadi kesalahan koneksi.';
+      console.error('Error Login:', error);
+    });
+  });
+</script>
+
+</body>
+</html>
