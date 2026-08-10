@@ -3,138 +3,558 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login System</title>
+  <title>Sistem Keuangan MTs Al Fatah Talun</title>
+
+  <link rel="icon" type="image/png" href="mts.ico">
+  <link rel="apple-touch-icon" href="icon.png">
+
+  <!-- Google Font & FontAwesome -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
   <style>
-    body { 
-      font-family: Arial, sans-serif; 
-      display: flex; 
-      justify-content: center; 
-      align-items: center; 
-      height: 100vh; 
-      margin: 0; 
-      background-color: #f4f4f9; 
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', sans-serif; }
+    body { background-color: #f3f4f6; color: #1f2937; min-height: 100vh; }
+
+    .hidden { display: none !important; }
+
+    /* ================= LOGIN STYLES ================= */
+    .login-body {
+      background: linear-gradient(135deg, #0d5c3a 0%, #15803d 50%, #166534 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
     }
-    .card { 
-      background: white; 
-      padding: 30px; 
-      border-radius: 8px; 
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1); 
-      width: 100%; 
-      max-width: 320px; 
+    .login-card {
+      background: #ffffff;
+      border-radius: 24px;
+      padding: 40px 30px;
+      width: 100%;
+      max-width: 460px;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
     }
-    .form-group { 
-      margin-bottom: 15px; 
+    .brand-header { text-align: center; margin-bottom: 24px; }
+    .brand-logo { width: 80px; height: 80px; margin: 0 auto 12px; }
+    .brand-logo img { width: 100%; height: 100%; object-fit: contain; }
+    .brand-title { font-size: 22px; font-weight: 700; color: #1f2937; }
+    .brand-subtitle { font-size: 13px; color: #6b7280; }
+
+    .role-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 12px 0 20px; }
+    .role-box {
+      border: 2px solid #e5e7eb; border-radius: 14px; padding: 12px 6px;
+      text-align: center; cursor: pointer; background: #f9fafb; transition: 0.2s;
     }
-    label { 
-      display: block; 
-      margin-bottom: 5px; 
-      font-weight: bold; 
+    .role-box:hover { border-color: #10b981; }
+    .role-box.active { border-color: #059669; background: #ecfdf5; }
+    .role-box.active i, .role-box.active span { color: #059669; font-weight: 600; }
+    .role-box i { font-size: 18px; display: block; margin-bottom: 4px; color: #6b7280; }
+    .role-box span { font-size: 11px; color: #4b5563; }
+
+    .input-group { margin-bottom: 16px; }
+    .input-group label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; }
+    .input-wrapper { position: relative; }
+    .input-wrapper i { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #9ca3af; }
+    .input-control {
+      width: 100%; padding: 12px 14px 12px 42px; border: 1.5px solid #d1d5db;
+      border-radius: 12px; font-size: 14px; outline: none; background: #f9fafb;
     }
-    input { 
-      width: 100%; 
-      padding: 10px; 
-      border: 1px solid #ccc; 
-      border-radius: 4px; 
-      box-sizing: border-box; 
+    .input-control:focus { border-color: #059669; background: #fff; }
+
+    .btn-submit {
+      width: 100%; padding: 14px; background: #059669; color: #fff; border: none;
+      border-radius: 12px; font-size: 15px; font-weight: 600; cursor: pointer; transition: 0.2s;
     }
-    button { 
-      width: 100%; 
-      padding: 10px; 
-      background-color: #007bff; 
-      color: white; 
-      border: none; 
-      border-radius: 4px; 
-      cursor: pointer; 
-      font-size: 16px; 
+    .btn-submit:hover { background: #047857; }
+
+    /* ================= DASHBOARD STYLES ================= */
+    .navbar {
+      background: #059669; color: white; padding: 14px 24px;
+      display: flex; justify-content: space-between; align-items: center;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
     }
-    button:disabled { 
-      background-color: #aaa; 
+    .nav-brand { display: flex; align-items: center; gap: 12px; }
+    .nav-brand img { width: 40px; height: 40px; background: white; border-radius: 50%; padding: 2px; }
+    .nav-user { display: flex; align-items: center; gap: 16px; }
+    .user-info { text-align: right; }
+    .user-name { font-weight: 600; font-size: 14px; }
+    .user-role { font-size: 11px; background: #047857; padding: 2px 8px; border-radius: 10px; }
+    .btn-logout {
+      background: #dc2626; color: white; border: none; padding: 8px 14px;
+      border-radius: 8px; font-size: 13px; cursor: pointer; font-weight: 500;
     }
-    #message { 
-      margin-top: 15px; 
-      text-align: center; 
-      font-size: 14px; 
-      font-weight: bold; 
+
+    .main-container { max-width: 1100px; margin: 24px auto; padding: 0 16px; }
+
+    /* Stat Cards */
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 24px; }
+    .stat-card {
+      background: white; border-radius: 16px; padding: 20px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05); display: flex; align-items: center; gap: 16px;
     }
+    .stat-icon {
+      width: 50px; height: 50px; border-radius: 12px; display: flex;
+      align-items: center; justify-content: center; font-size: 22px;
+    }
+    .stat-blue { background: #dbeafe; color: #2563eb; }
+    .stat-green { background: #dcfce7; color: #16a34a; }
+    .stat-yellow { background: #fef3c7; color: #d97706; }
+    .stat-title { font-size: 12px; color: #6b7280; font-weight: 500; }
+    .stat-value { font-size: 20px; font-weight: 700; color: #111827; margin-top: 2px; }
+
+    /* Tables */
+    .card-box { background: white; border-radius: 16px; padding: 24px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); margin-bottom: 24px; }
+    .card-title { font-size: 16px; font-weight: 600; margin-bottom: 16px; color: #1f2937; display: flex; justify-content: space-between; align-items: center; }
+    
+    table { width: 100%; border-collapse: collapse; margin-top: 8px; }
+    th, td { padding: 12px 14px; text-align: left; font-size: 13px; border-bottom: 1px solid #f3f4f6; }
+    th { background: #f9fafb; font-weight: 600; color: #4b5563; }
+    
+    .badge { padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; display: inline-block; }
+    .badge-lunas { background: #dcfce7; color: #15803d; }
+    .badge-belum { background: #fee2e2; color: #b91c1c; }
+
+    /* Admin Tabs */
+    .admin-nav { display: flex; gap: 8px; margin-bottom: 20px; border-bottom: 2px solid #e5e7eb; padding-bottom: 8px; overflow-x: auto; }
+    .tab-btn {
+      padding: 10px 18px; border: none; background: none; font-size: 14px; font-weight: 500;
+      color: #6b7280; cursor: pointer; border-radius: 8px; white-space: nowrap;
+    }
+    .tab-btn.active { background: #ecfdf5; color: #059669; font-weight: 600; }
+
+    /* Forms */
+    .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 16px; }
+    .form-control { width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 13px; }
   </style>
 </head>
-<body>
+<body class="login-body" id="bodyPage">
 
-<div class="card">
-  <h2>Masuk Sistem</h2>
-  <form id="loginForm">
-    <div class="form-group">
-      <label for="username">ID Login</label>
-      <input type="text" id="username" required autocomplete="off">
+  <!-- ================= HALAMAN LOGIN ================= -->
+  <div class="login-card" id="loginPage">
+    <div class="brand-header">
+      <div class="brand-logo"><img src="logo.png" alt="Logo Sekolah"></div>
+      <h1 class="brand-title">MTs Al Fatah Talun</h1>
+      <p class="brand-subtitle">Sistem Informasi Keuangan</p>
     </div>
-    <div class="form-group">
-      <label for="password">Password</label>
-      <input type="password" id="password" required>
+
+    <span style="font-size:12px; font-weight:600; color:#374151;">Pilih Akses Masuk:</span>
+    <div class="role-grid">
+      <div class="role-box active" onclick="selectRole('Siswa', this)">
+        <i class="fa-solid fa-user-graduate"></i>
+        <span>Siswa</span>
+      </div>
+      <div class="role-box" onclick="selectRole('Walikelas', this)">
+        <i class="fa-solid fa-chalkboard-user"></i>
+        <span>Wali Kelas</span>
+      </div>
+      <div class="role-box" onclick="selectRole('Admin', this)">
+        <i class="fa-solid fa-user-shield"></i>
+        <span>Admin</span>
+      </div>
     </div>
-    <button type="submit" id="btnSubmit">Masuk</button>
-  </form>
-  <div id="message"></div>
-</div>
 
-<script>
-  // PENTING: Ganti URL di bawah ini dengan URL Web App Apps Script Anda!
-  const scriptURL = 'https://script.google.com/macros/s/AKfycbzgveAgQ9NG-hfIaOrygn7szrgnrZm9BWUORlf714qHQrEsqBHja9JT8c9vfsMrsWJEsQ/exec';
+    <form onsubmit="event.preventDefault(); doLogin();">
+      <div class="input-group">
+        <label id="lblIdLogin">NISN Siswa</label>
+        <div class="input-wrapper">
+          <i class="fa-solid fa-id-card"></i>
+          <input type="text" id="idLogin" class="input-control" placeholder="Masukkan NISN" required>
+        </div>
+      </div>
 
-  const loginForm = document.getElementById('loginForm');
-  const btnSubmit = document.getElementById('btnSubmit');
-  const messageDiv = document.getElementById('message');
+      <div class="input-group hidden" id="divPassword">
+        <label>Password Admin</label>
+        <div class="input-wrapper">
+          <i class="fa-solid fa-lock"></i>
+          <input type="password" id="password" class="input-control" placeholder="Masukkan Password">
+        </div>
+      </div>
 
-  loginForm.addEventListener('submit', function(e) {
-    e.preventDefault();
+      <button type="submit" class="btn-submit" id="btnMasuk">Masuk <i class="fa-solid fa-arrow-right-to-bracket"></i></button>
+      <p id="pesanError" style="color:red; font-size:12px; text-align:center; margin-top:10px;"></p>
+    </form>
+  </div>
 
-    btnSubmit.disabled = true;
-    messageDiv.style.color = 'blue';
-    messageDiv.textContent = 'Memeriksa kredenial...';
 
-    const payload = {
-      username: document.getElementById('username').value,
-      password: document.getElementById('password').value
-    };
+  <!-- ================= HALAMAN DASHBOARD ================= -->
+  <div id="dashboardPage" class="hidden" style="width:100%;">
+    
+    <!-- Header App -->
+    <nav class="navbar">
+      <div class="nav-brand">
+        <img src="logo.png" alt="Logo">
+        <div>
+          <div style="font-weight:700; font-size:16px;">MTs Al Fatah Talun</div>
+          <div style="font-size:11px; opacity:0.9;">Sistem Keuangan Web</div>
+        </div>
+      </div>
+      <div class="nav-user">
+        <div class="user-info">
+          <div class="user-name" id="namaUser">User Name</div>
+          <span class="user-role" id="roleUser">Role</span>
+        </div>
+        <button class="btn-logout" onclick="logout()"><i class="fa-solid fa-power-off"></i> Keluar</button>
+      </div>
+    </nav>
 
-    // Mengirim request tanpa memicu preflight CORS
-    fetch(scriptURL, {
-      method: 'POST',
-      body: JSON.stringify(payload),
-      redirect: 'follow'
-    })
-    .then(response => {
-      if (!response.ok) {
-        throw new Error('Gagal menghubungi server');
-      }
-      return response.json(); // Membaca balasan dari server
-    })
-    .then(data => {
-      btnSubmit.disabled = false;
+    <div class="main-container">
 
-      if (data.status === 'success') {
-        messageDiv.style.color = 'green';
-        messageDiv.textContent = `Login Berhasil! Selamat datang, ${data.user.nama}`;
+      <!-- ============ DASHBOARD SISWA ============ -->
+      <div id="viewSiswa" class="hidden">
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon stat-blue"><i class="fa-solid fa-receipt"></i></div>
+            <div>
+              <div class="stat-title">Total Tagihan</div>
+              <div class="stat-value" id="sTotalTagihan">Rp 0</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon stat-green"><i class="fa-solid fa-circle-check"></i></div>
+            <div>
+              <div class="stat-title">Sudah Dibayar</div>
+              <div class="stat-value" id="sTotalLunas">Rp 0</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon stat-yellow"><i class="fa-solid fa-clock"></i></div>
+            <div>
+              <div class="stat-title">Sisa Tunggakan</div>
+              <div class="stat-value" id="sTotalSisa">Rp 0</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-box">
+          <div class="card-title">Rincian Tagihan Saya</div>
+          <table>
+            <thead>
+              <tr>
+                <th>Waktu</th>
+                <th>Jenis Pembayaran</th>
+                <th>Nominal</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="tblTagihanSiswa">
+              <tr><td colspan="4" style="text-align:center;">Memuat data...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+
+      <!-- ============ DASHBOARD WALI KELAS ============ -->
+      <div id="viewWalikelas" class="hidden">
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon stat-blue"><i class="fa-solid fa-users"></i></div>
+            <div>
+              <div class="stat-title">Kelas Yang Diampu</div>
+              <div class="stat-value" id="wkNamaKelas">-</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon stat-green"><i class="fa-solid fa-circle-dollar-to-slot"></i></div>
+            <div>
+              <div class="stat-title">Total Terbayar Kelas</div>
+              <div class="stat-value" id="wkTotalLunas">Rp 0</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-box">
+          <div class="card-title">
+            <span>Laporan Pembayaran Siswa</span>
+            <input type="text" id="cariWalikelas" onkeyup="filterTabelWalikelas()" placeholder="Cari Nama / NISN..." class="form-control" style="width:200px;">
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>NISN</th>
+                <th>Nama Siswa</th>
+                <th>Jenis Pembayaran</th>
+                <th>Nominal</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="tblWalikelas">
+              <tr><td colspan="5" style="text-align:center;">Memuat data kelas...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+
+      <!-- ============ DASHBOARD ADMIN ============ -->
+      <div id="viewAdmin" class="hidden">
         
-        // Simpan data user ke localStorage (opsional)
-        localStorage.setItem('userSession', JSON.stringify(data.user));
+        <!-- Navigasi Tab Admin -->
+        <div class="admin-nav">
+          <button class="tab-btn active" onclick="switchAdminTab('tabTrxSiswa', this)"><i class="fa-solid fa-user-check"></i> Transaksi Siswa</button>
+          <button class="tab-btn" onclick="switchAdminTab('tabTrxInternal', this)"><i class="fa-solid fa-wallet"></i> Transaksi Internal</button>
+          <button class="tab-btn" onclick="switchAdminTab('tabPengaturan', this)"><i class="fa-solid fa-tags"></i> Nama & Jenis Pembayaran</button>
+          <button class="tab-btn" onclick="switchAdminTab('tabLaporan', this)"><i class="fa-solid fa-chart-pie"></i> Laporan Keuangan</button>
+        </div>
 
-        // Jika Anda punya halaman dashboard, aktifkan kode di bawah ini:
-        // setTimeout(() => {
-        //   window.location.href = 'dashboard.html';
-        // }, 1000);
+        <!-- TAB 1: Transaksi Siswa -->
+        <div id="tabTrxSiswa">
+          <div class="card-box">
+            <div class="card-title">Catat Transaksi Siswa</div>
+            <form onsubmit="event.preventDefault(); simpanTrxSiswa();">
+              <div class="form-grid">
+                <input type="text" id="admNisn" placeholder="NISN Siswa" class="form-control" required>
+                <input type="text" id="admNamaSiswa" placeholder="Nama Siswa" class="form-control" required>
+                <input type="text" id="admKelasSiswa" placeholder="Kelas (misal: 7A)" class="form-control" required>
+                <input type="text" id="admJenisBayar" placeholder="Jenis Pembayaran" class="form-control" required>
+                <input type="number" id="admNominalBayar" placeholder="Nominal (Rp)" class="form-control" required>
+                <select id="admStatusBayar" class="form-control">
+                  <option value="Lunas">Lunas</option>
+                  <option value="Belum Lunas">Belum Lunas</option>
+                </select>
+              </div>
+              <button class="btn-submit" style="width:auto; padding:10px 24px;">Simpan Transaksi</button>
+            </form>
+          </div>
+        </div>
+
+        <!-- TAB 2: Transaksi Internal -->
+        <div id="tabTrxInternal" class="hidden">
+          <div class="card-box">
+            <div class="card-title">Pemasukan & Pengeluaran Internal</div>
+            <form onsubmit="event.preventDefault(); simpanTrxInternal();">
+              <div class="form-grid">
+                <select id="admJenisInternal" class="form-control">
+                  <option value="Pemasukan">Pemasukan</option>
+                  <option value="Pengeluaran">Pengeluaran</option>
+                </select>
+                <input type="number" id="admNominalInternal" placeholder="Nominal (Rp)" class="form-control" required>
+                <input type="text" id="admKetInternal" placeholder="Keterangan Transaksi" class="form-control" required>
+              </div>
+              <button class="btn-submit" style="width:auto; padding:10px 24px;">Simpan Transaksi Internal</button>
+            </form>
+          </div>
+        </div>
+
+        <!-- TAB 3: Pengaturan Pembayaran -->
+        <div id="tabPengaturan" class="hidden">
+          <div class="card-box">
+            <div class="card-title">Tambah Jenis Pembayaran & Tarif</div>
+            <form onsubmit="event.preventDefault(); simpanJenisBayar();">
+              <div class="form-grid">
+                <input type="text" id="admNamaJenis" placeholder="Nama Pembayaran (misal: SPP Juli)" class="form-control" required>
+                <input type="number" id="admTarifJenis" placeholder="Tarif (Rp)" class="form-control" required>
+                <input type="text" id="admTargetKelas" placeholder="Target Kelas (misal: Semua / 7A)" class="form-control" required>
+              </div>
+              <button class="btn-submit" style="width:auto; padding:10px 24px;">Tambah Jenis Pembayaran</button>
+            </form>
+          </div>
+        </div>
+
+        <!-- TAB 4: Laporan Keuangan -->
+        <div id="tabLaporan" class="hidden">
+          <div class="card-box">
+            <div class="card-title">Ringkasan Total Keuangan</div>
+            <p style="font-size:14px; color:#4b5563;">Data laporan total dan laporan per-kelas diambil otomatis dari Google Sheets.</p>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+
+  <!-- ================= JAVASCRIPT LOGIC ================= -->
+  <script>
+    const API_URL = "https://script.google.com/macros/s/AKfycb.../exec"; // Masukkan URL GAS Anda
+    let currentRole = 'Siswa';
+    let currentUser = null;
+    let dataWalikelasCache = [];
+
+    function selectRole(role, el) {
+      currentRole = role;
+      document.querySelectorAll('.role-box').forEach(b => b.classList.remove('active'));
+      el.classList.add('active');
+
+      const lblId = document.getElementById('lblIdLogin');
+      const inputId = document.getElementById('idLogin');
+      const divPass = document.getElementById('divPassword');
+
+      if (role === 'Siswa') {
+        lblId.innerText = 'NISN Siswa'; inputId.placeholder = 'Masukkan NISN'; divPass.classList.add('hidden');
+      } else if (role === 'Walikelas') {
+        lblId.innerText = 'PegID Wali Kelas'; inputId.placeholder = 'Masukkan PegID'; divPass.classList.add('hidden');
       } else {
-        messageDiv.style.color = 'red';
-        messageDiv.textContent = data.message; // Menampilkan pesan error dari Sheets
+        lblId.innerText = 'Username Admin'; inputId.placeholder = 'Masukkan Username'; divPass.classList.remove('hidden');
       }
-    })
-    .catch(error => {
-      btnSubmit.disabled = false;
-      messageDiv.style.color = 'red';
-      messageDiv.textContent = 'Terjadi kesalahan koneksi.';
-      console.error('Error Login:', error);
-    });
-  });
-</script>
+    }
 
+    async function apiCall(payload) {
+      const res = await fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) });
+      return await res.json();
+    }
+
+    async function doLogin() {
+      const idLogin = document.getElementById('idLogin').value;
+      const password = document.getElementById('password').value;
+      const btn = document.getElementById('btnMasuk');
+      const pErr = document.getElementById('pesanError');
+
+      pErr.innerText = "";
+      btn.disabled = true; btn.innerText = "Memproses...";
+
+      try {
+        const res = await apiCall({ action: 'login', role: currentRole, idLogin, password });
+        if (res.success) {
+          currentUser = res;
+          loadDashboard(res);
+        } else {
+          pErr.innerText = res.message;
+        }
+      } catch (e) {
+        pErr.innerText = "Gagal terhubung ke server.";
+      } finally {
+        btn.disabled = false; btn.innerText = "Masuk";
+      }
+    }
+
+    function loadDashboard(user) {
+      document.getElementById('bodyPage').classList.remove('login-body');
+      document.getElementById('loginPage').classList.add('hidden');
+      document.getElementById('dashboardPage').classList.remove('hidden');
+
+      document.getElementById('namaUser').innerText = user.nama;
+      document.getElementById('roleUser').innerText = user.role + (user.kelas ? ` (${user.kelas})` : '');
+
+      if (user.role === 'Siswa') {
+        document.getElementById('viewSiswa').classList.remove('hidden');
+        fetchSiswaData(user.idLogin);
+      } else if (user.role === 'Walikelas') {
+        document.getElementById('viewWalikelas').classList.remove('hidden');
+        document.getElementById('wkNamaKelas').innerText = user.kelas;
+        fetchWalikelasData(user.kelas);
+      } else if (user.role === 'Admin') {
+        document.getElementById('viewAdmin').classList.remove('hidden');
+      }
+    }
+
+    /* --- SISWA LOGIC --- */
+    async function fetchSiswaData(nisn) {
+      const res = await apiCall({ action: 'getTagihanSiswa', nisn });
+      let html = "";
+      let tot = 0, lunas = 0;
+
+      if (res.data && res.data.length > 0) {
+        res.data.forEach(r => {
+          tot += Number(r.nominal);
+          if (r.status === 'Lunas') lunas += Number(r.nominal);
+          
+          let badge = r.status === 'Lunas' ? 'badge-lunas' : 'badge-belum';
+          html += `<tr>
+            <td>${r.waktu}</td>
+            <td>${r.jenis}</td>
+            <td>Rp ${Number(r.nominal).toLocaleString('id-ID')}</td>
+            <td><span class="badge ${badge}">${r.status}</span></td>
+          </tr>`;
+        });
+      } else {
+        html = `<tr><td colspan="4" style="text-align:center;">Tidak ada tagihan.</td></tr>`;
+      }
+
+      document.getElementById('tblTagihanSiswa').innerHTML = html;
+      document.getElementById('sTotalTagihan').innerText = "Rp " + tot.toLocaleString('id-ID');
+      document.getElementById('sTotalLunas').innerText = "Rp " + lunas.toLocaleString('id-ID');
+      document.getElementById('sTotalSisa').innerText = "Rp " + (tot - lunas).toLocaleString('id-ID');
+    }
+
+    /* --- WALI KELAS LOGIC --- */
+    async function fetchWalikelasData(kelas) {
+      const res = await apiCall({ action: 'getLaporanWalikelas', kelas });
+      dataWalikelasCache = res.data || [];
+      renderWalikelasTabel(dataWalikelasCache);
+    }
+
+    function renderWalikelasTabel(data) {
+      let html = "";
+      let totLunas = 0;
+
+      if (data.length > 0) {
+        data.forEach(r => {
+          if (r.status === 'Lunas') totLunas += Number(r.nominal);
+          let badge = r.status === 'Lunas' ? 'badge-lunas' : 'badge-belum';
+          html += `<tr>
+            <td>${r.nisn}</td>
+            <td><b>${r.nama}</b></td>
+            <td>${r.jenis}</td>
+            <td>Rp ${Number(r.nominal).toLocaleString('id-ID')}</td>
+            <td><span class="badge ${badge}">${r.status}</span></td>
+          </tr>`;
+        });
+      } else {
+        html = `<tr><td colspan="5" style="text-align:center;">Belum ada data pembayaran kelas ini.</td></tr>`;
+      }
+
+      document.getElementById('tblWalikelas').innerHTML = html;
+      document.getElementById('wkTotalLunas').innerText = "Rp " + totLunas.toLocaleString('id-ID');
+    }
+
+    function filterTabelWalikelas() {
+      const q = document.getElementById('cariWalikelas').value.toLowerCase();
+      const filtered = dataWalikelasCache.filter(r => 
+        r.nama.toLowerCase().includes(q) || r.nisn.toString().includes(q)
+      );
+      renderWalikelasTabel(filtered);
+    }
+
+    /* --- ADMIN LOGIC --- */
+    function switchAdminTab(tabId, btn) {
+      document.querySelectorAll('.admin-nav .tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      ['tabTrxSiswa', 'tabTrxInternal', 'tabPengaturan', 'tabLaporan'].forEach(id => {
+        document.getElementById(id).classList.add('hidden');
+      });
+      document.getElementById(tabId).classList.remove('hidden');
+    }
+
+    async function simpanJenisBayar() {
+      const data = {
+        namaPembayaran: document.getElementById('admNamaJenis').value,
+        tarif: document.getElementById('admTarifJenis').value,
+        kelasTarget: document.getElementById('admTargetKelas').value
+      };
+      const res = await apiCall({ action: 'simpanJenisPembayaran', data });
+      alert(res.message);
+    }
+
+    async function simpanTrxSiswa() {
+      const data = {
+        nisn: document.getElementById('admNisn').value,
+        nama: document.getElementById('admNamaSiswa').value,
+        kelas: document.getElementById('admKelasSiswa').value,
+        jenis: document.getElementById('admJenisBayar').value,
+        nominal: document.getElementById('admNominalBayar').value,
+        status: document.getElementById('admStatusBayar').value
+      };
+      const res = await apiCall({ action: 'simpanTransaksiSiswa', data });
+      alert(res.message);
+    }
+
+    async function simpanTrxInternal() {
+      const data = {
+        jenis: document.getElementById('admJenisInternal').value,
+        nominal: document.getElementById('admNominalInternal').value,
+        keterangan: document.getElementById('admKetInternal').value
+      };
+      const res = await apiCall({ action: 'simpanTransaksiInternal', data });
+      alert(res.message);
+    }
+
+    function logout() {
+      location.reload();
+    }
+  </script>
 </body>
 </html>
