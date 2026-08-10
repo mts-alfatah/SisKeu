@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login Sistem Keuangan - MTs Al-Fatah</title>
+  <style>
+    body { 
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+      display: flex; 
+      justify-content: center; 
+      align-items: center; 
+      height: 100vh; 
+      margin: 0; 
+      background-color: #f0f2f5; 
+    }
+    .card { 
+      background: white; 
+      padding: 35px; 
+      border-radius: 12px; 
+      box-shadow: 0 6px 20px rgba(0,0,0,0.08); 
+      width: 100%; 
+      max-width: 350px; 
+    }
+    h2 {
+      margin-top: 0;
+      color: #333;
+      text-align: center;
+      font-size: 22px;
+      margin-bottom: 25px;
+    }
+    .form-group { 
+      margin-bottom: 18px; 
+    }
+    label { 
+      display: block; 
+      margin-bottom: 6px; 
+      font-weight: 600; 
+      color: #555;
+      font-size: 14px;
+    }
+    input { 
+      width: 100%; 
+      padding: 12px; 
+      border: 1px solid #ddd; 
+      border-radius: 6px; 
+      box-sizing: border-box; 
+      font-size: 14px;
+      transition: border-color 0.2s;
+    }
+    input:focus {
+      outline: none;
+      border-color: #007bff;
+    }
+    button { 
+      width: 100%; 
+      padding: 12px; 
+      background-color: #007bff; 
+      color: white; 
+      border: none; 
+      border-radius: 6px; 
+      cursor: pointer; 
+      font-size: 16px; 
+      font-weight: 600;
+      transition: background-color 0.2s;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    button:disabled { 
+      background-color: #b0c4de; 
+      cursor: not-allowed;
+    }
+    #message { 
+      margin-top: 20px; 
+      text-align: center; 
+      font-size: 14px; 
+      font-weight: 600; 
+    }
+  </style>
+</head>
+<body>
+
+<div class="card">
+  <h2>Login SisKeu</h2>
+  <form id="loginForm">
+    <div class="form-group">
+      <label for="username">ID Login / NISN / PegID</label>
+      <input type="text" id="username" placeholder="Masukkan ID Anda" required autocomplete="off">
+    </div>
+    <div class="form-group">
+      <label for="password">Password (Khusus Admin)</label>
+      <input type="password" id="password" placeholder="Kosongkan jika bukan admin">
+    </div>
+    <button type="submit" id="btnSubmit">Masuk</button>
+  </form>
+  <div id="message"></div>
+</div>
+
+<script>
+  // ⚠️ GANTI URL DI BAWAH INI DENGAN URL WEB APP GOOGLE APPS SCRIPT ANDA
+  const scriptURL = 'https://script.google.com/macros/s/AKfycbzneHDGHeaJrXWBbbGL4Vz_5LXp2hpU4kV3DGtDTWoErUCHBZ9wbTpZkOvO1dBodObPPA/exec';
+
+  const loginForm = document.getElementById('loginForm');
+  const btnSubmit = document.getElementById('btnSubmit');
+  const messageDiv = document.getElementById('message');
+
+  loginForm.addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    btnSubmit.disabled = true;
+    btnSubmit.textContent = 'Memeriksa...';
+    messageDiv.style.color = '#007bff';
+    messageDiv.textContent = 'Menghubungkan ke server...';
+
+    const payload = {
+      username: document.getElementById('username').value.trim(),
+      password: document.getElementById('password').value.trim()
+    };
+
+    // Mengirim data ke Google Apps Script tanpa memicu CORS preflight error
+    fetch(scriptURL, {
+      method: 'POST',
+      body: JSON.stringify(payload),
+      redirect: 'follow'
+    })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Gagal terhubung ke server jaringan.');
+      }
+      return response.json();
+    })
+    .then(data => {
+      btnSubmit.disabled = false;
+      btnSubmit.textContent = 'Masuk';
+
+      if (data.status === 'success') {
+        messageDiv.style.color = '#28a745';
+        messageDiv.textContent = `Login Berhasil! Halo, ${data.user.nama}`;
+        
+        // Menyimpan sesi data pengguna
+        localStorage.setItem('userSession', JSON.stringify(data.user));
+
+        // Contoh pengalihan halaman setelah berhasil login:
+        // setTimeout(() => {
+        //   window.location.href = 'dashboard.html';
+        // }, 1200);
+
+      } else {
+        messageDiv.style.color = '#dc3545';
+        messageDiv.textContent = data.message;
+      }
+    })
+    .catch(error => {
+      btnSubmit.disabled = false;
+      btnSubmit.textContent = 'Masuk';
+      messageDiv.style.color = '#dc3545';
+      messageDiv.textContent = 'Gagal terhubung server.';
+      console.error('Error:', error);
+    });
+  });
+</script>
+
+</body>
+</html>
