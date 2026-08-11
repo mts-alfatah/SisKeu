@@ -5,413 +5,354 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dashboard Admin - SisKeu MTs Al-Fatah</title>
   <style>
+    /* (CSS Sama dengan sebelumnya) */
     :root {
-      --primary-color: #0d6efd;
-      --bg-color: #f4f6f9;
-      --sidebar-width: 250px;
-      --card-bg: #ffffff;
-      --text-main: #333333;
+      --primary-color: #0d6efd; --primary-hover: #0b5ed7;
+      --success-color: #198754; --danger-color: #dc3545;
+      --bg-color: #f4f6f9; --sidebar-width: 260px;
+      --card-bg: #ffffff; --text-main: #333333;
       --border-color: #dee2e6;
     }
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; background-color: var(--bg-color); display: flex; color: var(--text-main); }
+    .sidebar { width: var(--sidebar-width); height: 100vh; background-color: #1e2227; color: white; position: fixed; display: flex; flex-direction: column; }
+    .sidebar-header { padding: 20px; font-size: 20px; font-weight: bold; border-bottom: 1px solid #2d3238; text-align: center; background: #181b1f; }
+    .sidebar-menu { list-style: none; padding: 10px 0; margin: 0; flex-grow: 1; }
+    .menu-label { padding: 10px 20px 5px; font-size: 11px; text-transform: uppercase; color: #6c757d; font-weight: bold; }
+    .sidebar-menu li a { display: block; padding: 12px 20px; color: #adb5bd; text-decoration: none; transition: 0.2s; font-size: 14px; }
+    .sidebar-menu li.active a, .sidebar-menu li a:hover { background-color: var(--primary-color); color: white; border-left: 4px solid #fff; }
+    .sidebar-footer { padding: 20px; border-top: 1px solid #2d3238; }
+    .btn-logout { width: 100%; padding: 10px; background-color: var(--danger-color); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
+    
+    .main-content { margin-left: var(--sidebar-width); flex-grow: 1; padding: 30px; }
+    .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; background: white; padding: 15px 25px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.02); }
+    .page-section { display: none; animation: fadeIn 0.3s; }
+    .page-section.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      margin: 0;
-      background-color: var(--bg-color);
-      display: flex;
-    }
+    .card-section { background: var(--card-bg); padding: 20px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
+    .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid var(--border-color); padding-bottom: 15px; }
+    .btn-add { padding: 8px 15px; background-color: var(--primary-color); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
+    table { width: 100%; border-collapse: collapse; text-align: left; }
+    th, td { padding: 12px 15px; border-bottom: 1px solid var(--border-color); font-size: 14px; }
+    th { background-color: #f8f9fa; }
 
-    /* Sidebar */
-    .sidebar {
-      width: var(--sidebar-width);
-      height: 100vh;
-      background-color: #212529;
-      color: white;
-      position: fixed;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-    }
-
-    .sidebar-header {
-      padding: 20px;
-      font-size: 18px;
-      font-weight: bold;
-      border-bottom: 1px solid #373b3e;
-      text-align: center;
-    }
-
-    .sidebar-menu {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-      flex-grow: 1;
-    }
-
-    .sidebar-menu li a {
-      display: block;
-      padding: 15px 20px;
-      color: #adb5bd;
-      text-decoration: none;
-      transition: 0.2s;
-    }
-
-    .sidebar-menu li.active a, .sidebar-menu li a:hover {
-      background-color: #343a40;
-      color: white;
-    }
-
-    .sidebar-footer {
-      padding: 20px;
-      border-top: 1px solid #373b3e;
-    }
-
-    .btn-logout {
-      width: 100%;
-      padding: 10px;
-      background-color: #dc3545;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      font-weight: 600;
-    }
-
-    .btn-logout:hover {
-      background-color: #bb2d3b;
-    }
-
-    /* Main Content */
-    .main-content {
-      margin-left: var(--sidebar-width);
-      flex-grow: 1;
-      padding: 30px;
-      box-sizing: border-box;
-    }
-
-    .header-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 30px;
-    }
-
-    .header-top h1 {
-      margin: 0;
-      font-size: 24px;
-      color: var(--text-main);
-    }
-
-    /* Cards Info */
-    .info-cards {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 20px;
-      margin-bottom: 30px;
-    }
-
-    .info-card {
-      background: var(--card-bg);
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.02);
-      border-left: 5px solid var(--primary-color);
-    }
-
-    .info-card h3 {
-      margin: 0 0 10px 0;
-      font-size: 14px;
-      color: #6c757d;
-    }
-
-    .info-card .number {
-      font-size: 24px;
-      font-weight: bold;
-      color: var(--text-main);
-    }
-
-    /* Section Tabel Akun */
-    .card-section {
-      background: var(--card-bg);
-      padding: 25px;
-      border-radius: 10px;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.02);
-    }
-
-    .section-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-    }
-
-    .btn-add {
-      padding: 10px 15px;
-      background-color: #198754;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      font-weight: 600;
-    }
-
-    .btn-add:hover {
-      background-color: #157347;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      text-align: left;
-    }
-
-    th, td {
-      padding: 12px 15px;
-      border-bottom: 1px solid var(--border-color);
-      font-size: 14px;
-    }
-
-    th {
-      background-color: #f8f9fa;
-      color: #495057;
-      font-weight: 600;
-    }
-
-    .badge {
-      padding: 5px 10px;
-      border-radius: 20px;
-      font-size: 11px;
-      font-weight: 600;
-    }
-
-    .badge-admin { background: #cfe2ff; color: #084298; }
-    .badge-walikelas { background: #fff3cd; color: #664d03; }
-    .badge-siswa { background: #d1e7dd; color: #0f5132; }
-
-    /* Modal Tambah Akun */
-    .modal {
-      display: none;
-      position: fixed;
-      top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.5);
-      justify-content: center;
-      align-items: center;
-    }
-
-    .modal-content {
-      background: white;
-      padding: 30px;
-      border-radius: 10px;
-      width: 100%;
-      max-width: 400px;
-    }
-
-    .form-group {
-      margin-bottom: 15px;
-    }
-
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000; }
+    .modal.active { display: flex; }
+    .modal-content { background: white; padding: 25px; border-radius: 10px; width: 100%; max-width: 450px; }
+    .form-group { margin-bottom: 15px; }
     label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 13px; }
     input, select { width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; box-sizing: border-box; }
-
-    .modal-actions {
-      display: flex;
-      justify-content: flex-end;
-      gap: 10px;
-      margin-top: 20px;
-    }
-
-    .btn-cancel { background: #6c757d; color: white; border: none; padding: 10px 15px; border-radius: 6px; cursor: pointer; }
-    .btn-save { background: var(--primary-color); color: white; border: none; padding: 10px 15px; border-radius: 6px; cursor: pointer; }
+    .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
+    .btn-cancel { background: #6c757d; color: white; border: none; padding: 9px 15px; border-radius: 6px; cursor: pointer; }
+    .btn-save { background: var(--success-color); color: white; border: none; padding: 9px 15px; border-radius: 6px; cursor: pointer; }
+    .btn-save:disabled { background: #adb5bd; cursor: not-allowed; }
   </style>
 </head>
 <body>
 
-  <!-- Sidebar -->
+  <!-- SIDEBAR -->
   <div class="sidebar">
-    <div>
-      <div class="sidebar-header">SisKeu Admin</div>
-      <ul class="sidebar-menu">
-        <li class="active"><a href="#">📊 Manajemen Akun</a></li>
-      </ul>
-    </div>
+    <div class="sidebar-header">🏫 SisKeu Admin</div>
+    <ul class="sidebar-menu">
+      <div class="menu-label">Transaksi</div>
+      <li class="nav-item active" data-target="transaksi-siswa"><a href="#">👨‍🎓 Transaksi Siswa</a></li>
+      <li class="nav-item" data-target="transaksi-internal"><a href="#">🔄 Transaksi Internal</a></li>
+      <div class="menu-label">Pengaturan Pembayaran</div>
+      <li class="nav-item" data-target="nama-pembayaran"><a href="#">🏷️ Nama Pembayaran</a></li>
+      <li class="nav-item" data-target="jenis-pembayaran"><a href="#">⚙️ Jenis & Tarif</a></li>
+    </ul>
     <div class="sidebar-footer">
-      <button class="btn-logout" onclick="logout()">Keluar</button>
+      <button class="btn-logout" onclick="logout()">🚪 Keluar</button>
     </div>
   </div>
 
-  <!-- Main Content -->
+  <!-- MAIN CONTENT -->
   <div class="main-content">
     <div class="header-top">
-      <h1>Dashboard Administrator</h1>
+      <h1 id="pageTitle">Transaksi Siswa</h1>
       <span id="adminNameLabel" style="font-weight: 600; color: #555;"></span>
     </div>
 
-    <!-- Ringkasan Kartu -->
-    <div class="info-cards">
-      <div class="info-card">
-        <h3>Total Pengguna</h3>
-        <div class="number" id="totalUsers">-</div>
+    <!-- TRANSAKSI SISWA -->
+    <div id="transaksi-siswa" class="page-section active">
+      <div class="card-section">
+        <div class="section-header">
+          <h3>Riwayat Pembayaran Siswa</h3>
+          <button class="btn-add" onclick="openModal('modal-transaksi-siswa')">+ Input Pembayaran</button>
+        </div>
+        <table>
+          <thead><tr><th>Tanggal</th><th>Siswa</th><th>Pembayaran</th><th>Nominal</th></tr></thead>
+          <tbody><tr><td colspan="4" style="text-align: center;">Data akan muncul setelah halaman dimuat ulang.</td></tr></tbody>
+        </table>
       </div>
     </div>
 
-    <!-- Tabel Pengguna -->
-    <div class="card-section">
-      <div class="section-header">
-        <h3 style="margin:0;">Daftar Akun Pengguna</h3>
-        <button class="btn-add" onclick="openModal()">+ Tambah Akun</button>
+    <!-- TRANSAKSI INTERNAL -->
+    <div id="transaksi-internal" class="page-section">
+      <div class="card-section">
+        <div class="section-header">
+          <h3>Pemasukan & Pengeluaran Internal</h3>
+          <button class="btn-add" onclick="openModal('modal-transaksi-internal')">+ Tambah Transaksi</button>
+        </div>
+        <table>
+          <thead><tr><th>Tanggal</th><th>Jenis</th><th>Keterangan</th><th>Nominal</th></tr></thead>
+          <tbody><tr><td colspan="4" style="text-align: center;">Data akan muncul setelah halaman dimuat ulang.</td></tr></tbody>
+        </table>
       </div>
-      
-      <table>
-        <thead>
-          <tr>
-            <th>Role</th>
-            <th>ID Login / NISN / PegID</th>
-            <th>Nama Lengkap</th>
-            <th>Kelas</th>
-          </tr>
-        </thead>
-        <tbody id="tableAkunBody">
-          <tr><td colspan="4" style="text-align: center;">Memuat data dari server...</td></tr>
-        </tbody>
-      </table>
     </div>
-  </div>
 
-  <!-- Modal Tambah Akun -->
-  <div class="modal" id="modalTambah">
+    <!-- NAMA PEMBAYARAN -->
+    <div id="nama-pembayaran" class="page-section">
+      <div class="card-section">
+        <div class="section-header">
+          <h3>Daftar Kategori Pembayaran Utama</h3>
+          <button class="btn-add" onclick="openModal('modal-nama-pembayaran')">+ Tambah Nama</button>
+        </div>
+        <table>
+          <thead><tr><th>Nama Pembayaran</th><th>Keterangan</th></tr></thead>
+          <tbody><tr><td colspan="2" style="text-align: center;">Data akan muncul setelah halaman dimuat ulang.</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- JENIS PEMBAYARAN & TARIF -->
+    <div id="jenis-pembayaran" class="page-section">
+      <div class="card-section">
+        <div class="section-header">
+          <h3>Pengaturan Tarif Pembayaran</h3>
+          <button class="btn-add" onclick="openModal('modal-jenis-pembayaran')">+ Tambah Tarif</button>
+        </div>
+        <table>
+          <thead><tr><th>Nama Pembayaran</th><th>Untuk Kelas</th><th>Nominal Tarif</th></tr></thead>
+          <tbody><tr><td colspan="3" style="text-align: center;">Data akan muncul setelah halaman dimuat ulang.</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div> <!-- End Main Content -->
+
+  <!-- ================= MODALS FORM INPUT ================= -->
+
+  <!-- Modal 1: Transaksi Siswa -->
+  <div class="modal" id="modal-transaksi-siswa">
     <div class="modal-content">
-      <h3>Tambah Akun Baru</h3>
-      <form id="formTambahAkun">
+      <h3>Input Pembayaran Siswa</h3>
+      <form id="form-ts">
         <div class="form-group">
-          <label>Role</label>
-          <select id="addRole" required>
-            <option value="Admin">Admin</option>
-            <option value="Walikelas">Wali Kelas</option>
-            <option value="Siswa">Siswa</option>
-          </select>
+          <label>NISN</label>
+          <input type="text" id="ts_nisn" required placeholder="Contoh: 0012345">
         </div>
         <div class="form-group">
-          <label>ID Login / NISN / PegID</label>
-          <input type="text" id="addId" required placeholder="Contoh: 0012345 atau admin">
+          <label>Nama Lengkap Siswa</label>
+          <input type="text" id="ts_nama" required placeholder="Contoh: Budi Santoso">
         </div>
         <div class="form-group">
-          <label>Password (Wajib untuk Admin)</label>
-          <input type="password" id="addPass" placeholder="Kosongkan jika bukan admin">
+          <label>Nama Pembayaran</label>
+          <input type="text" id="ts_pembayaran" required placeholder="Contoh: SPP Juli">
         </div>
         <div class="form-group">
-          <label>Nama Lengkap</label>
-          <input type="text" id="addNama" required placeholder="Nama lengkap pengguna">
-        </div>
-        <div class="form-group">
-          <label>Kelas (Opsional untuk Admin)</label>
-          <input type="text" id="addKelas" placeholder="Contoh: 7A">
+          <label>Nominal Bayar (Rp)</label>
+          <input type="number" id="ts_nominal" required placeholder="Contoh: 150000">
         </div>
         <div class="modal-actions">
-          <button type="button" class="btn-cancel" onclick="closeModal()">Batal</button>
-          <button type="submit" class="btn-save" id="btnSaveAkun">Simpan</button>
+          <button type="button" class="btn-cancel" onclick="closeModal('modal-transaksi-siswa')">Batal</button>
+          <button type="submit" class="btn-save" id="btn-ts">Simpan</button>
         </div>
       </form>
     </div>
   </div>
 
-<script>
-  // URL Web App Google Apps Script Anda
-  const scriptURL = 'https://script.google.com/macros/s/AKfycbzneHDGHeaJrXWBbbGL4Vz_5LXp2hpU4kV3DGtDTWoErUCHBZ9wbTpZkOvO1dBodObPPA/exec';
+  <!-- Modal 2: Transaksi Internal -->
+  <div class="modal" id="modal-transaksi-internal">
+    <div class="modal-content">
+      <h3>Input Transaksi Internal</h3>
+      <form id="form-ti">
+        <div class="form-group">
+          <label>Jenis Transaksi</label>
+          <select id="ti_jenis" required>
+            <option value="Pemasukan">Pemasukan (+)</option>
+            <option value="Pengeluaran">Pengeluaran (-)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Keterangan</label>
+          <input type="text" id="ti_keterangan" required placeholder="Cth: Beli Alat Tulis">
+        </div>
+        <div class="form-group">
+          <label>Nominal (Rp)</label>
+          <input type="number" id="ti_nominal" required>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn-cancel" onclick="closeModal('modal-transaksi-internal')">Batal</button>
+          <button type="submit" class="btn-save" id="btn-ti">Simpan</button>
+        </div>
+      </form>
+    </div>
+  </div>
 
-  // Cek sesi login saat halaman dibuka
-  const session = JSON.parse(localStorage.getItem('userSession'));
-  if (!session || session.role !== 'Admin') {
-    alert('Akses ditolak! Silakan login terlebih dahulu sebagai Admin.');
-    window.location.href = 'index.html';
-  } else {
-    document.getElementById('adminNameLabel').textContent = `Halo, ${session.nama}`;
-    loadDataAkun();
-  }
+  <!-- Modal 3: Nama Pembayaran -->
+  <div class="modal" id="modal-nama-pembayaran">
+    <div class="modal-content">
+      <h3>Tambah Nama Pembayaran Utama</h3>
+      <form id="form-np">
+        <div class="form-group">
+          <label>Nama Pembayaran</label>
+          <input type="text" id="np_nama" required placeholder="Contoh: Uang Gedung">
+        </div>
+        <div class="form-group">
+          <label>Keterangan Tambahan</label>
+          <input type="text" id="np_ket" placeholder="Contoh: Sekali bayar saat masuk">
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn-cancel" onclick="closeModal('modal-nama-pembayaran')">Batal</button>
+          <button type="submit" class="btn-save" id="btn-np">Simpan</button>
+        </div>
+      </form>
+    </div>
+  </div>
 
-  function logout() {
-    localStorage.removeItem('userSession');
-    window.location.href = 'index.html';
-  }
+  <!-- Modal 4: Jenis Pembayaran -->
+  <div class="modal" id="modal-jenis-pembayaran">
+    <div class="modal-content">
+      <h3>Pengaturan Tarif Pembayaran</h3>
+      <form id="form-tp">
+        <div class="form-group">
+          <label>Nama Pembayaran</label>
+          <input type="text" id="tp_nama" required placeholder="Contoh: SPP Bulanan">
+        </div>
+        <div class="form-group">
+          <label>Terapkan Pada Kelas</label>
+          <input type="text" id="tp_kelas" required placeholder="Contoh: 7A atau Semua Kelas">
+        </div>
+        <div class="form-group">
+          <label>Nominal Tarif (Rp)</label>
+          <input type="number" id="tp_nominal" required placeholder="Contoh: 150000">
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn-cancel" onclick="closeModal('modal-jenis-pembayaran')">Batal</button>
+          <button type="submit" class="btn-save" id="btn-tp">Simpan</button>
+        </div>
+      </form>
+    </div>
+  </div>
 
-  // Fungsi mengambil data akun dari server
-  function loadDataAkun() {
-    fetch(scriptURL + '?action=getAccounts')
-    .then(res => res.json())
-    .then(data => {
-      const tbody = document.getElementById('tableAkunBody');
-      tbody.innerHTML = '';
-      
-      if(data.status === 'success') {
-        document.getElementById('totalUsers').textContent = data.accounts.length;
-        data.accounts.forEach(acc => {
-          let badgeClass = 'badge-siswa';
-          if(acc.role === 'Admin') badgeClass = 'badge-admin';
-          else if(acc.role === 'Walikelas') badgeClass = 'badge-walikelas';
+  <script>
+    // URL SCRIPT ANDA
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbzneHDGHeaJrXWBbbGL4Vz_5LXp2hpU4kV3DGtDTWoErUCHBZ9wbTpZkOvO1dBodObPPA/exec';
 
-          tbody.innerHTML += `
-            <tr>
-              <td><span class="badge ${badgeClass}">${acc.role}</span></td>
-              <td>${acc.id}</td>
-              <td>${acc.nama}</td>
-              <td>${acc.kelas || '-'}</td>
-            </tr>
-          `;
-        });
-      } else {
-        tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: red;">${data.message}</td></tr>`;
-      }
-    })
-    .catch(err => {
-      console.error(err);
-      document.getElementById('tableAkunBody').innerHTML = `<tr><td colspan="4" style="text-align: center; color: red;">Gagal memuat data.</td></tr>`;
+    // --- AUTENTIKASI ---
+    const session = JSON.parse(localStorage.getItem('userSession'));
+    if (!session || session.role !== 'Admin') {
+      alert('Sesi habis atau akses ditolak.');
+      window.location.href = 'index.html';
+    } else {
+      document.getElementById('adminNameLabel').textContent = `Halo, ${session.nama}`;
+    }
+
+    function logout() { localStorage.removeItem('userSession'); window.location.href = 'index.html'; }
+
+    // --- NAVIGASI MENU ---
+    const navItems = document.querySelectorAll('.nav-item');
+    const pageSections = document.querySelectorAll('.page-section');
+    const pageTitle = document.getElementById('pageTitle');
+
+    navItems.forEach(item => {
+      item.addEventListener('click', function(e) {
+        e.preventDefault();
+        navItems.forEach(nav => nav.classList.remove('active'));
+        this.classList.add('active');
+        pageSections.forEach(section => section.classList.remove('active'));
+        const targetId = this.getAttribute('data-target');
+        document.getElementById(targetId).classList.add('active');
+        pageTitle.textContent = this.textContent.replace(/[^a-zA-Z0-9 &]/g, '').trim();
+      });
     });
-  }
 
-  // Modal Control
-  function openModal() { document.getElementById('modalTambah').style.display = 'flex'; }
-  function closeModal() { document.getElementById('modalTambah').style.display = 'none'; }
+    // --- MODAL CONTROLLER ---
+    function openModal(modalId) { document.getElementById(modalId).classList.add('active'); }
+    function closeModal(modalId) { document.getElementById(modalId).classList.remove('active'); }
 
-  // Tambah Akun Handler
-  document.getElementById('formTambahAkun').addEventListener('submit', function(e) {
-    e.preventDefault();
-    const btn = document.getElementById('btnSaveAkun');
-    btn.disabled = true;
-    btn.textContent = 'Menyimpan...';
+    // --- FUNGSI KIRIM DATA KE GOOGLE SHEETS ---
+    function submitData(formId, btnId, modalId, payload) {
+      const btn = document.getElementById(btnId);
+      const originalText = btn.textContent;
+      btn.textContent = 'Menyimpan...';
+      btn.disabled = true;
 
-    const payload = {
-      action: 'addAccount',
-      role: document.getElementById('addRole').value,
-      id: document.getElementById('addId').value.trim(),
-      password: document.getElementById('addPass').value.trim(),
-      nama: document.getElementById('addNama').value.trim(),
-      kelas: document.getElementById('addKelas').value.trim()
-    };
+      fetch(scriptURL, {
+        method: 'POST',
+        body: JSON.stringify(payload)
+      })
+      .then(response => response.json())
+      .then(data => {
+        btn.textContent = originalText;
+        btn.disabled = false;
+        if (data.status === 'success') {
+          alert(data.message);
+          document.getElementById(formId).reset(); // Kosongkan form
+          closeModal(modalId); // Tutup popup
+        } else {
+          alert('Gagal: ' + data.message);
+        }
+      })
+      .catch(error => {
+        btn.textContent = originalText;
+        btn.disabled = false;
+        alert('Gagal terhubung ke jaringan/server.');
+      });
+    }
 
-    fetch(scriptURL, {
-      method: 'POST',
-      body: JSON.stringify(payload),
-      redirect: 'follow'
-    })
-    .then(res => res.json())
-    .then(data => {
-      btn.disabled = false;
-      btn.textContent = 'Simpan';
-      if(data.status === 'success') {
-        alert('Akun berhasil ditambahkan!');
-        closeModal();
-        document.getElementById('formTambahAkun').reset();
-        loadDataAkun();
-      } else {
-        alert('Gagal: ' + data.message);
-      }
-    })
-    .catch(err => {
-      btn.disabled = false;
-      btn.textContent = 'Simpan';
-      alert('Terjadi kesalahan koneksi server.');
+    // --- EVENT LISTENER UNTUK SETIAP FORM ---
+    
+    // 1. Submit Transaksi Siswa
+    document.getElementById('form-ts').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const payload = {
+        action: 'addTransaksiSiswa',
+        nisn: document.getElementById('ts_nisn').value,
+        namaSiswa: document.getElementById('ts_nama').value,
+        pembayaran: document.getElementById('ts_pembayaran').value,
+        nominal: document.getElementById('ts_nominal').value,
+        admin: session.nama // Menyimpan siapa admin yang menginput
+      };
+      submitData('form-ts', 'btn-ts', 'modal-transaksi-siswa', payload);
     });
-  });
-</script>
 
+    // 2. Submit Transaksi Internal
+    document.getElementById('form-ti').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const payload = {
+        action: 'addTransaksiInternal',
+        jenis: document.getElementById('ti_jenis').value,
+        keterangan: document.getElementById('ti_keterangan').value,
+        nominal: document.getElementById('ti_nominal').value,
+        admin: session.nama
+      };
+      submitData('form-ti', 'btn-ti', 'modal-transaksi-internal', payload);
+    });
+
+    // 3. Submit Nama Pembayaran
+    document.getElementById('form-np').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const payload = {
+        action: 'addNamaPembayaran',
+        namaPembayaran: document.getElementById('np_nama').value,
+        keterangan: document.getElementById('np_ket').value
+      };
+      submitData('form-np', 'btn-np', 'modal-nama-pembayaran', payload);
+    });
+
+    // 4. Submit Jenis Tarif
+    document.getElementById('form-tp').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const payload = {
+        action: 'addTarifPembayaran',
+        namaPembayaran: document.getElementById('tp_nama').value,
+        targetKelas: document.getElementById('tp_kelas').value,
+        nominalTarif: document.getElementById('tp_nominal').value
+      };
+      submitData('form-tp', 'btn-tp', 'modal-jenis-pembayaran', payload);
+    });
+  </script>
 </body>
 </html>
