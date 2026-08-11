@@ -296,13 +296,22 @@
 
       if (data.status === 'success') {
         messageDiv.style.color = '#198754';
-        messageDiv.textContent = `Login Berhasil! Selamat datang, ${data.user.nama}`;
+        messageDiv.textContent = `Login Berhasil! Mengalihkan...`;
         
         // Simpan sesi login
         localStorage.setItem('userSession', JSON.stringify(data.user));
 
-        // Contoh pengalihan halaman (aktifkan jika dashboard.html sudah ada)
-        // setTimeout(() => { window.location.href = 'dashboard.html'; }, 1000);
+        // Pengalihan halaman otomatis sesuai dengan Role
+        setTimeout(() => { 
+          if (data.user.role === 'Admin') {
+            window.location.href = 'admin.html'; // Mengarah ke halaman admin
+          } else if (data.user.role === 'Walikelas') {
+            window.location.href = 'walikelas.html'; // Siapkan file walikelas.html nanti
+          } else if (data.user.role === 'Siswa') {
+            window.location.href = 'siswa.html'; // Siapkan file siswa.html nanti
+          }
+        }, 1000); // Waktu tunda 1 detik (1000 ms)
+      }
       } else {
         messageDiv.style.color = '#dc3545';
         messageDiv.textContent = data.message;
