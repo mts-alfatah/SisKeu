@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login Sistem Keuangan - MTs Al-Fatah</title>
+  <style>
+    :root {
+      --primary-color: #0d6efd;
+      --primary-hover: #0b5ed7;
+      --bg-color: #f8f9fa;
+      --card-bg: #ffffff;
+      --text-main: #333333;
+      --text-muted: #6c757d;
+      --border-color: #dee2e6;
+    }
+
+    body { 
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+      display: flex; 
+      justify-content: center; 
+      align-items: center; 
+      min-height: 100vh; 
+      margin: 0; 
+      background-color: var(--bg-color); 
+    }
+
+    .container {
+      width: 100%;
+      max-width: 420px;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+
+    .card { 
+      background: var(--card-bg); 
+      padding: 30px; 
+      border-radius: 16px; 
+      box-shadow: 0 10px 25px rgba(0,0,0,0.05); 
+    }
+
+    /* Bagian Logo & Header */
+    .brand-header {
+      text-align: center;
+      margin-bottom: 25px;
+    }
+
+    .logo-img {
+      width: 70px;
+      height: 70px;
+      object-fit: contain;
+      margin-bottom: 12px;
+      border-radius: 50%;
+      background: #e9ecef;
+      padding: 5px;
+    }
+
+    h2 {
+      margin: 0;
+      color: var(--text-main);
+      font-size: 22px;
+      font-weight: 700;
+    }
+
+    p.subtitle {
+      margin: 5px 0 0 0;
+      color: var(--text-muted);
+      font-size: 13px;
+    }
+
+    /* Kotak-kotak Pilihan Role (Grid) */
+    .role-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .role-card {
+      border: 2px solid var(--border-color);
+      border-radius: 10px;
+      padding: 12px 8px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      background: #fff;
+    }
+
+    .role-card:hover {
+      border-color: var(--primary-color);
+      background: #f1f8ff;
+    }
+
+    .role-card.active {
+      border-color: var(--primary-color);
+      background: #e7f1ff;
+      box-shadow: 0 0 0 2px rgba(13, 110, 253, 0.2);
+    }
+
+    .role-icon {
+      font-size: 20px;
+      margin-bottom: 4px;
+    }
+
+    .role-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    /* Form Styles */
+    .form-group { 
+      margin-bottom: 15px; 
+    }
+
+    label { 
+      display: block; 
+      margin-bottom: 6px; 
+      font-weight: 600; 
+      color: #495057;
+      font-size: 13px;
+    }
+
+    input { 
+      width: 100%; 
+      padding: 11px 14px; 
+      border: 1px solid var(--border-color); 
+      border-radius: 8px; 
+      box-sizing: border-box; 
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.15);
+    }
+
+    button.btn-login { 
+      width: 100%; 
+      padding: 12px; 
+      background-color: var(--primary-color); 
+      color: white; 
+      border: none; 
+      border-radius: 8px; 
+      cursor: pointer; 
+      font-size: 15px; 
+      font-weight: 600;
+      transition: background-color 0.2s;
+      margin-top: 5px;
+    }
+
+    button.btn-login:hover {
+      background-color: var(--primary-hover);
+    }
+
+    button.btn-login:disabled { 
+      background-color: #adb5bd; 
+      cursor: not-allowed;
+    }
+
+    #message { 
+      margin-top: 15px; 
+      text-align: center; 
+      font-size: 13px; 
+      font-weight: 600; 
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <div class="card">
+    
+    <!-- Logo & Judul -->
+    <div class="brand-header">
+      <!-- Ganti src dengan link logo Anda atau folder lokal -->
+      <img src="logo.png" alt="Logo Sekolah" class="logo-img" id="schoolLogo">
+      <h2>SisKeu MTs Al-Fatah</h2>
+      <p class="subtitle">Silakan pilih akses masuk Anda</p>
+    </div>
+
+    <!-- Kotak-kotak Pilihan Role -->
+    <div class="role-grid">
+      <div class="role-card active" onclick="selectRole('Admin', this)">
+        <div class="role-icon">🛡️</div>
+        <div class="role-title">Admin</div>
+      </div>
+      <div class="role-card" onclick="selectRole('Walikelas', this)">
+        <div class="role-icon">👨‍🏫</div>
+        <div class="role-title">Wali Kelas</div>
+      </div>
+      <div class="role-card" onclick="selectRole('Siswa', this)">
+        <div class="role-icon">🎓</div>
+        <div class="role-title">Siswa</div>
+      </div>
+    </div>
+
+    <!-- Form Login -->
+    <form id="loginForm">
+      <!-- Hidden input untuk menyimpan role yang dipilih -->
+      <input type="hidden" id="selectedRole" value="Admin">
+
+      <div class="form-group">
+        <label id="labelUsername" for="username">Username / ID Admin</label>
+        <input type="text" id="username" placeholder="Masukkan ID Admin" required autocomplete="off">
+      </div>
+
+      <div class="form-group" id="groupPassword">
+        <label for="password">Password</label>
+        <input type="password" id="password" placeholder="Masukkan password">
+      </div>
+
+      <button type="submit" id="btnSubmit" class="btn-login">Masuk</button>
+    </form>
+
+    <div id="message"></div>
+  </div>
+</div>
+
+<script>
+  // ⚠️ GANTI URL DI BAWAH INI DENGAN URL WEB APP GOOGLE APPS SCRIPT ANDA
+  const scriptURL = 'https://script.google.com/macros/s/AKfycbzneHDGHeaJrXWBbbGL4Vz_5LXp2hpU4kV3DGtDTWoErUCHBZ9wbTpZkOvO1dBodObPPA/exec';
+
+  // Fungsi interaktif saat kotak role diklik
+  function selectRole(roleName, element) {
+    // Hapus kelas 'active' dari semua kotak
+    document.querySelectorAll('.role-card').forEach(card => {
+      card.classList.remove('active');
+    });
+    
+    // Tambahkan kelas 'active' ke kotak yang diklik
+    element.classList.add('active');
+    
+    // Set nilai input tersembunyi
+    document.getElementById('selectedRole').value = roleName;
+
+    // Sesuaikan teks label & placeholder secara dinamis agar lebih intuitif
+    const labelUser = document.getElementById('labelUsername');
+    const inputUser = document.getElementById('username');
+    const groupPass = document.getElementById('groupPassword');
+    const inputPass = document.getElementById('password');
+
+    if (roleName === 'Admin') {
+      labelUser.textContent = 'Username Admin';
+      inputUser.placeholder = 'Masukkan username admin';
+      groupPass.style.display = 'block';
+      inputPass.required = true;
+    } else if (roleName === 'Walikelas') {
+      labelUser.textContent = 'PegID / ID Wali Kelas';
+      inputUser.placeholder = 'Contoh: PEG001';
+      groupPass.style.display = 'none'; // Sembunyikan password
+      inputPass.required = false;
+    } else if (roleName === 'Siswa') {
+      labelUser.textContent = 'NISN Siswa';
+      inputUser.placeholder = 'Contoh: 0012345';
+      groupPass.style.display = 'none'; // Sembunyikan password
+      inputPass.required = false;
+    }
+  }
+
+  // Proses Submit Form Login
+  const loginForm = document.getElementById('loginForm');
+  const btnSubmit = document.getElementById('btnSubmit');
+  const messageDiv = document.getElementById('message');
+
+  loginForm.addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    btnSubmit.disabled = true;
+    btnSubmit.textContent = 'Memeriksa...';
+    messageDiv.style.color = '#0d6efd';
+    messageDiv.textContent = 'Menghubungkan ke server...';
+
+    const payload = {
+      role: document.getElementById('selectedRole').value,
+      username: document.getElementById('username').value.trim(),
+      password: document.getElementById('password').value.trim()
+    };
+
+    fetch(scriptURL, {
+      method: 'POST',
+      body: JSON.stringify(payload),
+      redirect: 'follow'
+    })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Gagal terhubung ke server.');
+      }
+      return response.json();
+    })
+    .then(data => {
+      btnSubmit.disabled = false;
+      btnSubmit.textContent = 'Masuk';
+
+      if (data.status === 'success') {
+        messageDiv.style.color = '#198754';
+        messageDiv.textContent = `Login Berhasil! Mengalihkan...`;
+        
+        // Simpan sesi login
+        localStorage.setItem('userSession', JSON.stringify(data.user));
+
+        // Pengalihan halaman otomatis sesuai dengan Role
+        setTimeout(() => { 
+          if (data.user.role === 'Admin') {
+            window.location.href = 'admin.html'; // Mengarah ke halaman admin
+          } else if (data.user.role === 'Walikelas') {
+            window.location.href = 'walikelas.html'; 
+          } else if (data.user.role === 'Siswa') {
+            window.location.href = 'siswa.html'; 
+          }
+        }, 1000); // Waktu tunda 1 detik
+      } else {
+        messageDiv.style.color = '#dc3545';
+        messageDiv.textContent = data.message;
+      }
+    })
+    .catch(error => {
+      btnSubmit.disabled = false;
+      btnSubmit.textContent = 'Masuk';
+      messageDiv.style.color = '#dc3545';
+      messageDiv.textContent = 'Gagal terhubung server.';
+      console.error('Error:', error);
+    });
+  });
+</script>
+
+</body>
+</html>
