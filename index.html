@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login Sistem Keuangan - MTs Al-Fatah</title>
+
+  <!-- Tab Icon Browser -->
+  <link rel="icon" href="mts.ico" type="image/x-icon">
+  <link rel="shortcut icon" href="mts.ico" type="image/x-icon">
+
+  <!-- Tag PWA -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0d6efd">
+  <link rel="apple-touch-icon" href="logo-192.png">
+
+  <!-- External Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="container">
+  <div class="card">
+    
+    <div class="brand-header">
+      <img src="logo.png" alt="Logo Sekolah" class="logo-img" id="schoolLogo">
+      <h2>SisKeu MTs Al-Fatah</h2>
+      <p class="subtitle">Silakan pilih akses masuk Anda</p>
+    </div>
+
+    <div class="role-grid">
+      <div class="role-card active" onclick="selectRole('Admin', this)">
+        <div class="role-icon">🛡️</div>
+        <div class="role-title">Admin</div>
+      </div>
+      <div class="role-card" onclick="selectRole('Walikelas', this)">
+        <div class="role-icon">👨‍🏫</div>
+        <div class="role-title">Wali Kelas</div>
+      </div>
+      <div class="role-card" onclick="selectRole('Siswa', this)">
+        <div class="role-icon">🎓</div>
+        <div class="role-title">Siswa</div>
+      </div>
+    </div>
+
+    <form id="loginForm">
+      <input type="hidden" id="selectedRole" value="Admin">
+
+      <div class="form-group">
+        <label id="labelUsername" for="username">Username / ID Admin</label>
+        <input type="text" id="username" placeholder="Masukkan ID Admin" required autocomplete="off">
+      </div>
+
+      <div class="form-group" id="groupPassword">
+        <label for="password">Password</label>
+        <input type="password" id="password" placeholder="Masukkan password">
+      </div>
+
+      <button type="submit" id="btnSubmit" class="btn-login">Masuk</button>
+    </form>
+
+    <div id="message"></div>
+  </div>
+</div>
+
+<!-- External Script (Gabungan) -->
+<script src="script.js"></script>
+
+</body>
+</html>
