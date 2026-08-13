@@ -1,0 +1,1159 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard Admin - SisKeu MTs Al-Fatah</title>
+  <style>
+    :root {
+      --primary-color: #0d6efd;
+      --primary-hover: #0b5ed7;
+      --success-color: #198754;
+      --success-hover: #157347;
+      --danger-color: #dc3545;
+      --danger-hover: #bb2d3b;
+      --bg-color: #f4f6f9;
+      --sidebar-width: 260px;
+      --card-bg: #ffffff;
+      --text-main: #333333;
+      --text-muted: #6c757d;
+      --border-color: #dee2e6;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      background-color: var(--bg-color);
+      display: flex;
+      color: var(--text-main);
+    }
+
+    .sidebar {
+      width: var(--sidebar-width);
+      height: 100vh;
+      background-color: #1e2227;
+      color: white;
+      position: fixed;
+      display: flex;
+      flex-direction: column;
+      z-index: 500;
+    }
+    .sidebar-header {
+      padding: 20px;
+      font-size: 18px;
+      font-weight: bold;
+      border-bottom: 1px solid #2d3238;
+      text-align: center;
+      background: #181b1f;
+    }
+    .sidebar-menu { list-style: none; padding: 10px 0; margin: 0; flex-grow: 1; overflow-y: auto; }
+    .menu-label { padding: 12px 20px 5px; font-size: 11px; text-transform: uppercase; color: #6c757d; font-weight: bold; letter-spacing: 0.5px; }
+    .sidebar-menu li a { display: block; padding: 12px 20px; color: #adb5bd; text-decoration: none; transition: all 0.2s; font-size: 14px; }
+    .sidebar-menu li.active a, .sidebar-menu li a:hover { background-color: var(--primary-color); color: white; border-left: 4px solid #fff; }
+    .sidebar-footer { padding: 20px; border-top: 1px solid #2d3238; }
+    .btn-logout { width: 100%; padding: 10px; background-color: var(--danger-color); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
+    .btn-logout:hover { background-color: var(--danger-hover); }
+
+    .main-content { margin-left: var(--sidebar-width); flex-grow: 1; padding: 30px; min-height: 100vh; box-sizing: border-box; }
+    .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; background: white; padding: 15px 25px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.02); }
+    .header-top h1 { margin: 0; font-size: 20px; }
+    .page-section { display: none; animation: fadeIn 0.3s; }
+    .page-section.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    .info-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 25px; }
+    .info-card { background: var(--card-bg); padding: 20px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); border-left: 5px solid var(--primary-color); }
+    .info-card.success { border-left-color: var(--success-color); }
+    .info-card.danger { border-left-color: var(--danger-color); }
+    .info-card h3 { margin: 0 0 10px 0; font-size: 13px; color: var(--text-muted); }
+    .info-card .number { font-size: 22px; font-weight: bold; color: var(--text-main); }
+
+    .card-section { background: var(--card-bg); padding: 20px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); margin-bottom: 20px; }
+    .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid var(--border-color); flex-wrap: wrap; gap: 10px; }
+    .section-header h3 { margin: 0; }
+    .section-header-actions { display: flex; gap: 8px; }
+
+    .toolbar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 15px; }
+    .toolbar .search-input { flex: 1 1 220px; padding: 9px 12px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 14px; }
+    .toolbar .date-input { padding: 9px 10px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 13px; color: var(--text-muted); }
+    .toolbar select.filter-select { padding: 9px 10px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 13px; }
+
+    .btn-add { padding: 8px 15px; background-color: var(--primary-color); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 13px; white-space: nowrap; }
+    .btn-add:hover { background-color: var(--primary-hover); }
+    .btn-export { padding: 8px 15px; background-color: var(--success-color); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 13px; white-space: nowrap; }
+    .btn-export:hover { background-color: var(--success-hover); }
+    .btn-clear-filter { padding: 9px 12px; background: #e9ecef; color: var(--text-main); border: none; border-radius: 6px; cursor: pointer; font-size: 13px; }
+    .btn-clear-filter:hover { background: #dde1e5; }
+    .result-count { font-size: 12px; color: var(--text-muted); margin-bottom: 10px; }
+
+    table { width: 100%; border-collapse: collapse; text-align: left; }
+    th, td { padding: 12px 15px; border-bottom: 1px solid var(--border-color); font-size: 14px; }
+    th { background-color: #f8f9fa; font-weight: 600; }
+    tbody tr:hover { background-color: #fafbfc; }
+
+    .row-actions { display: flex; gap: 6px; white-space: nowrap; }
+    .btn-icon { border: none; border-radius: 5px; padding: 6px 10px; cursor: pointer; font-size: 12px; font-weight: 600; }
+    .btn-edit { background: #fff3cd; color: #664d03; }
+    .btn-edit:hover { background: #ffe69c; }
+    .btn-delete { background: #f8d7da; color: #842029; }
+    .btn-delete:hover { background: #f1aeb5; }
+
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000; }
+    .modal.active { display: flex; }
+    .modal-content { background: white; padding: 25px; border-radius: 10px; width: 100%; max-width: 450px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+    .form-group { margin-bottom: 15px; }
+    label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 13px; }
+    input, select { width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; box-sizing: border-box; }
+    select:disabled { background: #f1f3f5; color: var(--text-muted); }
+    .field-hint { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+    .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
+    .btn-cancel { background: #6c757d; color: white; border: none; padding: 9px 15px; border-radius: 6px; cursor: pointer; }
+    .btn-save { background: var(--success-color); color: white; border: none; padding: 9px 15px; border-radius: 6px; cursor: pointer; }
+
+    .empty-state { text-align: center; padding: 30px 15px; color: var(--text-muted); }
+
+    @media (max-width: 768px) {
+      .sidebar { display: none; }
+      .main-content { margin-left: 0; }
+    }
+  </style>
+  <!-- Library untuk export Laporan ke Excel (.xlsx) dan PDF -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+</head>
+<body>
+
+  <div class="sidebar">
+    <div class="sidebar-header">🏫 SisKeu Admin</div>
+    <ul class="sidebar-menu">
+      <div class="menu-label">Transaksi</div>
+      <li class="nav-item active" data-target="transaksi-siswa"><a href="#">👨‍🎓 Transaksi Siswa</a></li>
+      <li class="nav-item" data-target="transaksi-internal"><a href="#">🔄 Transaksi Internal</a></li>
+
+      <div class="menu-label">Pengaturan Pembayaran</div>
+      <li class="nav-item" data-target="jenis-pembayaran"><a href="#">⚙️ Jenis & Tarif</a></li>
+
+      <div class="menu-label">Pengaturan Sistem</div>
+      <li class="nav-item" data-target="manajemen-akun"><a href="#">🔑 Manajemen Akun</a></li>
+
+      <div class="menu-label">Laporan</div>
+      <li class="nav-item" data-target="laporan-total"><a href="#">📊 Total Keuangan</a></li>
+    </ul>
+    <div class="sidebar-footer">
+      <button class="btn-logout" onclick="logout()">🚪 Keluar</button>
+    </div>
+  </div>
+
+  <div class="main-content">
+    <div class="header-top">
+      <h1 id="pageTitle">Transaksi Siswa</h1>
+      <span id="adminNameLabel" style="font-weight: 600; color: #555;">Halo, Admin</span>
+    </div>
+
+    <!-- 1. TRANSAKSI SISWA -->
+    <div id="transaksi-siswa" class="page-section active">
+      <div class="card-section">
+        <div class="section-header">
+          <h3>Riwayat Pembayaran Siswa</h3>
+          <div class="section-header-actions">
+            <button class="btn-add" onclick="openAddTsModal()">+ Input Pembayaran</button>
+          </div>
+        </div>
+        <div class="toolbar">
+          <input type="text" class="search-input" id="search-ts" placeholder="🔍 Cari nama siswa, NISN, atau jenis pembayaran..." oninput="renderTransaksiSiswa()">
+          <input type="date" class="date-input" id="from-ts" onchange="renderTransaksiSiswa()">
+          <input type="date" class="date-input" id="to-ts" onchange="renderTransaksiSiswa()">
+          <button class="btn-clear-filter" onclick="clearFilter('ts')">Reset Filter</button>
+        </div>
+        <div class="result-count" id="count-ts"></div>
+        <table>
+          <thead><tr><th>Tanggal</th><th>Siswa</th><th>Jenis Pembayaran</th><th>Nominal</th><th>Petugas</th><th>Aksi</th></tr></thead>
+          <tbody id="tbody-transaksi-siswa"><tr><td colspan="6" style="text-align: center;">Memuat data...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 2. TRANSAKSI INTERNAL -->
+    <div id="transaksi-internal" class="page-section">
+      <div class="card-section">
+        <div class="section-header">
+          <h3>Pemasukan & Pengeluaran Internal</h3>
+          <div class="section-header-actions">
+            <button class="btn-add" onclick="openModal('modal-transaksi-internal')">+ Tambah Transaksi</button>
+          </div>
+        </div>
+        <div class="toolbar">
+          <input type="text" class="search-input" id="search-ti" placeholder="🔍 Cari keterangan..." oninput="renderTransaksiInternal()">
+          <select class="filter-select" id="jenis-ti" onchange="renderTransaksiInternal()">
+            <option value="">Semua Jenis</option>
+            <option value="Pemasukan">Pemasukan</option>
+            <option value="Pengeluaran">Pengeluaran</option>
+          </select>
+          <input type="date" class="date-input" id="from-ti" onchange="renderTransaksiInternal()">
+          <input type="date" class="date-input" id="to-ti" onchange="renderTransaksiInternal()">
+          <button class="btn-clear-filter" onclick="clearFilter('ti')">Reset Filter</button>
+        </div>
+        <div class="result-count" id="count-ti"></div>
+        <table>
+          <thead><tr><th>Tanggal</th><th>Jenis</th><th>Keterangan</th><th>Nominal</th><th>Petugas</th><th>Aksi</th></tr></thead>
+          <tbody id="tbody-transaksi-internal"><tr><td colspan="6" style="text-align: center;">Memuat data...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 3. JENIS & TARIF -->
+    <div id="jenis-pembayaran" class="page-section">
+      <div class="card-section">
+        <div class="section-header">
+          <h3>Pengaturan Tarif Pembayaran</h3>
+          <div class="section-header-actions">
+            <button class="btn-add" onclick="openModal('modal-jenis-pembayaran')">+ Tambah Tarif</button>
+          </div>
+        </div>
+        <div class="toolbar">
+          <input type="text" class="search-input" id="search-tp" placeholder="🔍 Cari nama pembayaran atau kelas..." oninput="renderTarifPembayaran()">
+          <button class="btn-clear-filter" onclick="clearFilter('tp')">Reset Filter</button>
+        </div>
+        <div class="result-count" id="count-tp"></div>
+        <table>
+          <thead><tr><th>Nama Pembayaran</th><th>Untuk Kelas</th><th>Nominal Tarif</th><th>Aksi</th></tr></thead>
+          <tbody id="tbody-tarif-pembayaran"><tr><td colspan="4" style="text-align: center;">Memuat data...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 4. MANAJEMEN AKUN -->
+    <div id="manajemen-akun" class="page-section">
+      <div class="card-section">
+        <div class="section-header">
+          <h3>Manajemen Akun (Admin / Wali Kelas / Siswa)</h3>
+          <div class="section-header-actions">
+            <button class="btn-add" onclick="openAddAkunModal()">+ Tambah Akun</button>
+          </div>
+        </div>
+        <div class="toolbar">
+          <input type="text" class="search-input" id="search-akun" placeholder="🔍 Cari ID Login atau nama..." oninput="renderAkun()">
+          <select class="filter-select" id="role-akun" onchange="renderAkun()">
+            <option value="">Semua Role</option>
+            <option value="Admin">Admin</option>
+            <option value="Walikelas">Wali Kelas</option>
+            <option value="Siswa">Siswa</option>
+          </select>
+          <button class="btn-clear-filter" onclick="clearFilter('akun')">Reset Filter</button>
+        </div>
+        <div class="result-count" id="count-akun"></div>
+        <table>
+          <thead><tr><th>ID Login</th><th>Nama</th><th>Role</th><th>Kelas</th><th>Aksi</th></tr></thead>
+          <tbody id="tbody-akun"><tr><td colspan="5" style="text-align: center;">Memuat data...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 5. LAPORAN TOTAL -->
+    <div id="laporan-total" class="page-section">
+      <div class="info-cards">
+        <div class="info-card success">
+          <h3>Total Pemasukan Siswa & Internal (Semua Waktu)</h3>
+          <div class="number" id="total-pemasukan">Rp 0</div>
+        </div>
+        <div class="info-card danger">
+          <h3>Total Pengeluaran Internal (Semua Waktu)</h3>
+          <div class="number" id="total-pengeluaran">Rp 0</div>
+        </div>
+        <div class="info-card">
+          <h3>Saldo Kas saat ini</h3>
+          <div class="number" id="saldo-total">Rp 0</div>
+        </div>
+      </div>
+
+      <div class="card-section">
+        <div class="section-header">
+          <h3>Laporan Transaksi per Periode</h3>
+          <div class="section-header-actions">
+            <button class="btn-export" onclick="exportLaporanExcel()">📊 Export Excel</button>
+            <button class="btn-export" onclick="exportLaporanPDF()">📄 Export PDF</button>
+          </div>
+        </div>
+        <div class="toolbar">
+          <label style="font-size:13px; font-weight:600; margin:0;">Dari</label>
+          <input type="date" class="date-input" id="from-laporan" onchange="renderLaporan()">
+          <label style="font-size:13px; font-weight:600; margin:0;">Sampai</label>
+          <input type="date" class="date-input" id="to-laporan" onchange="renderLaporan()">
+          <select class="filter-select" id="jenis-laporan" onchange="renderLaporan()">
+            <option value="">Semua Jenis</option>
+            <option value="Pemasukan">Pemasukan</option>
+            <option value="Pengeluaran">Pengeluaran</option>
+          </select>
+          <button class="btn-clear-filter" onclick="clearFilter('laporan')">Reset Filter</button>
+        </div>
+        <div class="info-cards" style="margin-bottom: 15px;">
+          <div class="info-card success">
+            <h3>Pemasukan (Periode Terpilih)</h3>
+            <div class="number" id="periode-pemasukan">Rp 0</div>
+          </div>
+          <div class="info-card danger">
+            <h3>Pengeluaran (Periode Terpilih)</h3>
+            <div class="number" id="periode-pengeluaran">Rp 0</div>
+          </div>
+          <div class="info-card">
+            <h3>Selisih (Periode Terpilih)</h3>
+            <div class="number" id="periode-selisih">Rp 0</div>
+          </div>
+        </div>
+        <div class="result-count" id="count-laporan"></div>
+        <table>
+          <thead><tr><th>Tanggal</th><th>Sumber</th><th>Keterangan</th><th>Jenis</th><th>Nominal</th><th>Petugas</th></tr></thead>
+          <tbody id="tbody-laporan"><tr><td colspan="6" style="text-align: center;">Memuat data...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ================= MODALS ================= -->
+
+  <div class="modal" id="modal-transaksi-siswa">
+    <div class="modal-content">
+      <h3 id="modal-ts-title">Input Pembayaran Siswa</h3>
+      <form id="form-ts">
+        <input type="hidden" id="ts_sheetRow">
+        <div class="form-group">
+          <label>Siswa (NISN - Nama)</label>
+          <select id="ts_siswaSelect" required>
+            <option value="">-- Pilih Siswa --</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Jenis Pembayaran</label>
+          <select id="ts_pembayaran" required>
+            <option value="">-- Pilih Siswa terlebih dahulu --</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Nominal Bayar (Rp)</label>
+          <input type="number" id="ts_nominal" required placeholder="Contoh: 100000">
+          <div class="field-hint">Terisi otomatis dari tarif, bisa diubah bila perlu (mis. bayar sebagian).</div>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn-cancel" onclick="closeModal('modal-transaksi-siswa')">Batal</button>
+          <button type="submit" class="btn-save" id="btn-ts">Simpan</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal" id="modal-transaksi-internal">
+    <div class="modal-content">
+      <h3 id="modal-ti-title">Input Transaksi Internal</h3>
+      <form id="form-ti">
+        <input type="hidden" id="ti_sheetRow">
+        <div class="form-group">
+          <label>Jenis Transaksi</label>
+          <select id="ti_jenis" required>
+            <option value="Pemasukan">Pemasukan (+)</option>
+            <option value="Pengeluaran">Pengeluaran (-)</option>
+          </select>
+        </div>
+        <div class="form-group"><label>Keterangan</label><input type="text" id="ti_keterangan" required placeholder="Cth: Pembelian Spidol"></div>
+        <div class="form-group"><label>Nominal (Rp)</label><input type="number" id="ti_nominal" required></div>
+        <div class="modal-actions">
+          <button type="button" class="btn-cancel" onclick="closeModal('modal-transaksi-internal')">Batal</button>
+          <button type="submit" class="btn-save" id="btn-ti">Simpan</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal" id="modal-jenis-pembayaran">
+    <div class="modal-content">
+      <h3 id="modal-tp-title">Pengaturan Tarif Pembayaran</h3>
+      <form id="form-tp">
+        <input type="hidden" id="tp_sheetRow">
+        <div class="form-group"><label>Nama Pembayaran</label><input type="text" id="tp_nama" required placeholder="Contoh: SPP Bulanan"></div>
+        <div class="form-group"><label>Untuk Kelas</label><input type="text" id="tp_kelas" required placeholder="Contoh: 7A / Semua Kelas"></div>
+        <div class="form-group"><label>Nominal Tarif (Rp)</label><input type="number" id="tp_nominal" required placeholder="Contoh: 150000"></div>
+        <div class="modal-actions">
+          <button type="button" class="btn-cancel" onclick="closeModal('modal-jenis-pembayaran')">Batal</button>
+          <button type="submit" class="btn-save" id="btn-tp">Simpan</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal" id="modal-akun">
+    <div class="modal-content">
+      <h3 id="modal-akun-title">Tambah Akun</h3>
+      <form id="form-akun">
+        <input type="hidden" id="akun_sheetRow">
+        <div class="form-group">
+          <label>Role</label>
+          <select id="akun_role" required>
+            <option value="Admin">Admin</option>
+            <option value="Walikelas">Wali Kelas</option>
+            <option value="Siswa">Siswa</option>
+          </select>
+        </div>
+        <div class="form-group"><label>ID Login</label><input type="text" id="akun_idLogin" required placeholder="Contoh: 0012345 / PEG001 / admin1"></div>
+        <div class="form-group"><label>Nama</label><input type="text" id="akun_nama" required placeholder="Nama lengkap"></div>
+        <div class="form-group"><label>Kelas (khusus Siswa/Wali Kelas)</label><input type="text" id="akun_kelas" placeholder="Contoh: 7A"></div>
+        <div class="form-group">
+          <label id="akun_password_label">Password</label>
+          <input type="password" id="akun_password" placeholder="Masukkan password" autocomplete="new-password">
+          <div class="field-hint" id="akun_password_hint" style="display:none;">Kosongkan bila tidak ingin mengubah password.</div>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn-cancel" onclick="closeModal('modal-akun')">Batal</button>
+          <button type="submit" class="btn-save" id="btn-akun">Simpan</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbzneHDGHeaJrXWBbbGL4Vz_5LXp2hpU4kV3DGtDTWoErUCHBZ9wbTpZkOvO1dBodObPPA/exec';
+
+    const session = JSON.parse(localStorage.getItem('userSession'));
+    if (!session || String(session.role || '').trim().toLowerCase() !== 'admin') {
+      alert('Sesi habis atau akses ditolak.');
+      window.location.href = 'index.html';
+    } else {
+      document.getElementById('adminNameLabel').textContent = `Halo, ${session.nama}`;
+    }
+
+    function logout() {
+      localStorage.removeItem('userSession');
+      window.location.href = 'index.html';
+    }
+
+    function formatRp(value) {
+      let num = parseFloat(value) || 0;
+      return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(num);
+    }
+
+    function escapeHtml(str) {
+      if (str === null || str === undefined) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    function toComparableDate(val) {
+      if (!val) return null;
+      const d = new Date(val);
+      if (!isNaN(d.getTime())) return d;
+      const parts = String(val).split('/');
+      if (parts.length === 3) {
+        const d2 = new Date(parts[2], parts[1] - 1, parts[0]);
+        if (!isNaN(d2.getTime())) return d2;
+      }
+      return null;
+    }
+
+    function inDateRange(val, fromId, toId) {
+      const from = document.getElementById(fromId).value;
+      const to = document.getElementById(toId).value;
+      if (!from && !to) return true;
+      const d = toComparableDate(val);
+      if (!d) return true;
+      if (from && d < new Date(from)) return false;
+      if (to && d > new Date(to + 'T23:59:59')) return false;
+      return true;
+    }
+
+    function clearFilter(prefix) {
+      const search = document.getElementById('search-' + prefix);
+      if (search) search.value = '';
+      const from = document.getElementById('from-' + prefix);
+      if (from) from.value = '';
+      const to = document.getElementById('to-' + prefix);
+      if (to) to.value = '';
+      const jenis = document.getElementById('jenis-' + prefix);
+      if (jenis) jenis.value = '';
+      const role = document.getElementById('role-' + prefix);
+      if (role) role.value = '';
+      if (prefix === 'ts') renderTransaksiSiswa();
+      if (prefix === 'ti') renderTransaksiInternal();
+      if (prefix === 'tp') renderTarifPembayaran();
+      if (prefix === 'akun') renderAkun();
+      if (prefix === 'laporan') renderLaporan();
+    }
+
+    function exportToCSV(prefix) {
+      const map = {
+        tp: { data: () => filteredTp, headers: ['Nama Pembayaran', 'Untuk Kelas', 'Nominal Tarif'], rows: r => [r.namaPembayaran, r.targetKelas, r.nominalTarif] }
+      };
+      const cfg = map[prefix];
+      const rows = cfg.data();
+      if (!rows || rows.length === 0) { alert('Tidak ada data untuk diekspor.'); return; }
+      const csvLines = [cfg.headers.join(',')];
+      rows.forEach(r => {
+        const line = cfg.rows(r).map(v => {
+          let s = v === null || v === undefined ? '' : String(v);
+          if (s.includes(',') || s.includes('"') || s.includes('\n')) s = '"' + s.replace(/"/g, '""') + '"';
+          return s;
+        }).join(',');
+        csvLines.push(line);
+      });
+      const csvContent = '\uFEFF' + csvLines.join('\n');
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = prefix + '-export-' + new Date().toISOString().slice(0, 10) + '.csv';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    function openModal(id) { document.getElementById(id).classList.add('active'); }
+    function closeModal(id) {
+      document.getElementById(id).classList.remove('active');
+      if (id === 'modal-transaksi-siswa') {
+        document.getElementById('form-ts').reset();
+        document.getElementById('ts_sheetRow').value = '';
+        document.getElementById('ts_pembayaran').innerHTML = '<option value="">-- Pilih Siswa terlebih dahulu --</option>';
+        document.getElementById('modal-ts-title').textContent = 'Input Pembayaran Siswa';
+      }
+      if (id === 'modal-transaksi-internal') { document.getElementById('form-ti').reset(); document.getElementById('ti_sheetRow').value = ''; document.getElementById('modal-ti-title').textContent = 'Input Transaksi Internal'; }
+      if (id === 'modal-jenis-pembayaran') { document.getElementById('form-tp').reset(); document.getElementById('tp_sheetRow').value = ''; document.getElementById('modal-tp-title').textContent = 'Pengaturan Tarif Pembayaran'; }
+      if (id === 'modal-akun') {
+        document.getElementById('form-akun').reset();
+        document.getElementById('akun_sheetRow').value = '';
+        document.getElementById('akun_password').required = true;
+        document.getElementById('akun_password_hint').style.display = 'none';
+        document.getElementById('modal-akun-title').textContent = 'Tambah Akun';
+      }
+    }
+
+    const navItems = document.querySelectorAll('.nav-item');
+    const pageSections = document.querySelectorAll('.page-section');
+    const pageTitle = document.getElementById('pageTitle');
+
+    navItems.forEach(item => {
+      item.addEventListener('click', function(e) {
+        e.preventDefault();
+        navItems.forEach(nav => nav.classList.remove('active'));
+        this.classList.add('active');
+        pageSections.forEach(section => section.classList.remove('active'));
+        const targetId = this.getAttribute('data-target');
+        document.getElementById(targetId).classList.add('active');
+        pageTitle.textContent = this.textContent.replace(/[^a-zA-Z0-9 &]/g, '').trim();
+        loadDataForSection(targetId);
+      });
+    });
+
+    function loadDataForSection(sectionId) {
+      if (sectionId === 'transaksi-siswa') loadTransaksiSiswa();
+      if (sectionId === 'transaksi-internal') loadTransaksiInternal();
+      if (sectionId === 'jenis-pembayaran') loadTarifPembayaran();
+      if (sectionId === 'manajemen-akun') loadAkun();
+      if (sectionId === 'laporan-total') loadLaporanTotal();
+    }
+
+    // --- DATA STORES ---
+    // Setiap record dari backend membawa "sheetRow": nomor baris asli di Google Sheet.
+    // Ini dipakai sebagai kunci edit/hapus karena urutan tampilan (data.reverse() di backend)
+    // tidak sama dengan urutan baris di sheet.
+    let rawTs = [], filteredTs = [];
+    let rawTi = [], filteredTi = [];
+    let rawTp = [], filteredTp = [];
+    let rawAkun = [], filteredAkun = [];
+    let rawLaporan = [], filteredLaporan = [];
+
+    // Data untuk dropdown pada modal Input Pembayaran Siswa
+    let tsModalSiswaList = [];
+    let tsModalTarifList = [];
+
+    function loadTransaksiSiswa() {
+      const tbody = document.getElementById('tbody-transaksi-siswa');
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align: center;">⏳ Memuat data...</td></tr>';
+      fetch(scriptURL + '?action=getTransaksiSiswa')
+        .then(r => r.json())
+        .then(res => { rawTs = (res.status === 'success') ? res.data : []; renderTransaksiSiswa(); })
+        .catch(() => { tbody.innerHTML = '<tr><td colspan="6" class="empty-state">Gagal memuat data.</td></tr>'; });
+    }
+
+    function renderTransaksiSiswa() {
+      const tbody = document.getElementById('tbody-transaksi-siswa');
+      const q = (document.getElementById('search-ts').value || '').toLowerCase().trim();
+      filteredTs = rawTs.filter(r => {
+        const matchesSearch = !q || [r.nama, r.nisn, r.pembayaran].some(v => String(v || '').toLowerCase().includes(q));
+        const matchesDate = inDateRange(r.tanggal, 'from-ts', 'to-ts');
+        return matchesSearch && matchesDate;
+      });
+      document.getElementById('count-ts').textContent = `Menampilkan ${filteredTs.length} dari ${rawTs.length} transaksi`;
+      if (filteredTs.length > 0) {
+        tbody.innerHTML = filteredTs.map(r => `
+          <tr>
+            <td>${escapeHtml(r.tanggal)}</td>
+            <td><strong>${escapeHtml(r.nama)}</strong><br><small style="color:gray;">${escapeHtml(r.nisn)}</small></td>
+            <td>${escapeHtml(r.pembayaran)}</td>
+            <td style="color:green; font-weight:bold;">${formatRp(r.nominal)}</td>
+            <td>${escapeHtml(r.admin) || '-'}</td>
+            <td>
+              <div class="row-actions">
+                <button class="btn-icon btn-edit" onclick="editTransaksiSiswa(${r.sheetRow})">✏️ Edit</button>
+                <button class="btn-icon btn-delete" onclick="deleteTransaksiSiswa(${r.sheetRow})">🗑️ Hapus</button>
+              </div>
+            </td>
+          </tr>
+        `).join('');
+      } else {
+        tbody.innerHTML = '<tr><td colspan="6" class="empty-state">Tidak ada data yang cocok.</td></tr>';
+      }
+    }
+
+    function loadTransaksiInternal() {
+      const tbody = document.getElementById('tbody-transaksi-internal');
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align: center;">⏳ Memuat data...</td></tr>';
+      fetch(scriptURL + '?action=getTransaksiInternal')
+        .then(r => r.json())
+        .then(res => { rawTi = (res.status === 'success') ? res.data : []; renderTransaksiInternal(); })
+        .catch(() => { tbody.innerHTML = '<tr><td colspan="6" class="empty-state">Gagal memuat data.</td></tr>'; });
+    }
+
+    function renderTransaksiInternal() {
+      const tbody = document.getElementById('tbody-transaksi-internal');
+      const q = (document.getElementById('search-ti').value || '').toLowerCase().trim();
+      const jenisFilter = document.getElementById('jenis-ti').value;
+      filteredTi = rawTi.filter(r => {
+        const matchesSearch = !q || String(r.keterangan || '').toLowerCase().includes(q);
+        const matchesJenis = !jenisFilter || r.jenis === jenisFilter;
+        const matchesDate = inDateRange(r.tanggal, 'from-ti', 'to-ti');
+        return matchesSearch && matchesJenis && matchesDate;
+      });
+      document.getElementById('count-ti').textContent = `Menampilkan ${filteredTi.length} dari ${rawTi.length} transaksi`;
+      if (filteredTi.length > 0) {
+        tbody.innerHTML = filteredTi.map(r => {
+          let isMasuk = r.jenis === 'Pemasukan';
+          let badge = isMasuk ? '<span style="color:green;font-weight:bold;">(+) Pemasukan</span>' : '<span style="color:red;font-weight:bold;">(-) Pengeluaran</span>';
+          return `
+            <tr>
+              <td>${escapeHtml(r.tanggal)}</td>
+              <td>${badge}</td>
+              <td>${escapeHtml(r.keterangan)}</td>
+              <td><strong>${formatRp(r.nominal)}</strong></td>
+              <td>${escapeHtml(r.admin) || '-'}</td>
+              <td>
+                <div class="row-actions">
+                  <button class="btn-icon btn-edit" onclick="editTransaksiInternal(${r.sheetRow})">✏️ Edit</button>
+                  <button class="btn-icon btn-delete" onclick="deleteTransaksiInternal(${r.sheetRow})">🗑️ Hapus</button>
+                </div>
+              </td>
+            </tr>
+          `;
+        }).join('');
+      } else {
+        tbody.innerHTML = '<tr><td colspan="6" class="empty-state">Tidak ada data yang cocok.</td></tr>';
+      }
+    }
+
+    function loadTarifPembayaran() {
+      const tbody = document.getElementById('tbody-tarif-pembayaran');
+      tbody.innerHTML = '<tr><td colspan="4" style="text-align: center;">⏳ Memuat data...</td></tr>';
+      fetch(scriptURL + '?action=getTarifPembayaran')
+        .then(r => r.json())
+        .then(res => { rawTp = (res.status === 'success') ? res.data : []; renderTarifPembayaran(); })
+        .catch(() => { tbody.innerHTML = '<tr><td colspan="4" class="empty-state">Gagal memuat data.</td></tr>'; });
+    }
+
+    function renderTarifPembayaran() {
+      const tbody = document.getElementById('tbody-tarif-pembayaran');
+      const q = (document.getElementById('search-tp').value || '').toLowerCase().trim();
+      filteredTp = rawTp.filter(r => !q || [r.namaPembayaran, r.targetKelas].some(v => String(v || '').toLowerCase().includes(q)));
+      document.getElementById('count-tp').textContent = `Menampilkan ${filteredTp.length} dari ${rawTp.length} tarif`;
+      if (filteredTp.length > 0) {
+        tbody.innerHTML = filteredTp.map(r => `
+          <tr>
+            <td><strong>${escapeHtml(r.namaPembayaran)}</strong></td>
+            <td>${escapeHtml(r.targetKelas)}</td>
+            <td>${formatRp(r.nominalTarif)}</td>
+            <td>
+              <div class="row-actions">
+                <button class="btn-icon btn-edit" onclick="editTarifPembayaran(${r.sheetRow})">✏️ Edit</button>
+                <button class="btn-icon btn-delete" onclick="deleteTarifPembayaran(${r.sheetRow})">🗑️ Hapus</button>
+              </div>
+            </td>
+          </tr>
+        `).join('');
+      } else {
+        tbody.innerHTML = '<tr><td colspan="4" class="empty-state">Tidak ada data yang cocok.</td></tr>';
+      }
+    }
+
+    function loadAkun() {
+      const tbody = document.getElementById('tbody-akun');
+      tbody.innerHTML = '<tr><td colspan="5" style="text-align: center;">⏳ Memuat data...</td></tr>';
+      fetch(scriptURL + '?action=getAccounts')
+        .then(r => r.json())
+        .then(res => { rawAkun = (res.status === 'success') ? res.data : []; renderAkun(); })
+        .catch(() => { tbody.innerHTML = '<tr><td colspan="5" class="empty-state">Gagal memuat data.</td></tr>'; });
+    }
+
+    function renderAkun() {
+      const tbody = document.getElementById('tbody-akun');
+      const q = (document.getElementById('search-akun').value || '').toLowerCase().trim();
+      const roleFilter = document.getElementById('role-akun').value;
+      filteredAkun = rawAkun.filter(r => {
+        const matchesSearch = !q || [r.idLogin, r.nama].some(v => String(v || '').toLowerCase().includes(q));
+        const matchesRole = !roleFilter || String(r.role).toLowerCase() === roleFilter.toLowerCase();
+        return matchesSearch && matchesRole;
+      });
+      document.getElementById('count-akun').textContent = `Menampilkan ${filteredAkun.length} dari ${rawAkun.length} akun`;
+      if (filteredAkun.length > 0) {
+        tbody.innerHTML = filteredAkun.map(r => `
+          <tr>
+            <td><strong>${escapeHtml(r.idLogin)}</strong></td>
+            <td>${escapeHtml(r.nama)}</td>
+            <td>${escapeHtml(r.role)}</td>
+            <td>${escapeHtml(r.kelas) || '-'}</td>
+            <td>
+              <div class="row-actions">
+                <button class="btn-icon btn-edit" onclick="editAkun(${r.sheetRow})">✏️ Edit</button>
+                <button class="btn-icon btn-delete" onclick="deleteAkun(${r.sheetRow})">🗑️ Hapus</button>
+              </div>
+            </td>
+          </tr>
+        `).join('');
+      } else {
+        tbody.innerHTML = '<tr><td colspan="5" class="empty-state">Tidak ada data yang cocok.</td></tr>';
+      }
+    }
+
+    function openAddAkunModal() {
+      document.getElementById('modal-akun-title').textContent = 'Tambah Akun';
+      document.getElementById('akun_password').required = true;
+      document.getElementById('akun_password_hint').style.display = 'none';
+      openModal('modal-akun');
+    }
+
+    function editAkun(sheetRow) {
+      const r = rawAkun.find(x => x.sheetRow === sheetRow);
+      if (!r) return;
+      document.getElementById('akun_sheetRow').value = sheetRow;
+      document.getElementById('akun_role').value = r.role;
+      document.getElementById('akun_idLogin').value = r.idLogin;
+      document.getElementById('akun_nama').value = r.nama;
+      document.getElementById('akun_kelas').value = r.kelas || '';
+      document.getElementById('akun_password').value = '';
+      document.getElementById('akun_password').required = false; // kosongkan = password tidak berubah
+      document.getElementById('akun_password_hint').style.display = 'block';
+      document.getElementById('modal-akun-title').textContent = 'Edit Akun';
+      openModal('modal-akun');
+    }
+
+    function deleteAkun(sheetRow) {
+      const r = rawAkun.find(x => x.sheetRow === sheetRow);
+      if (!r) return;
+      if (!confirm(`Hapus akun "${r.nama}" (${r.idLogin})? Akun ini tidak akan bisa login lagi.`)) return;
+      submitData(null, null, null, { action: 'deleteAccount', sheetRow: sheetRow }, 'manajemen-akun');
+    }
+
+    function loadLaporanTotal() {
+      let totalMasuk = 0;
+      let totalKeluar = 0;
+      const tbody = document.getElementById('tbody-laporan');
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align: center;">⏳ Memuat data...</td></tr>';
+      Promise.all([
+        fetch(scriptURL + '?action=getTransaksiSiswa').then(r => r.json()),
+        fetch(scriptURL + '?action=getTransaksiInternal').then(r => r.json())
+      ]).then(([resSiswa, resInternal]) => {
+        rawLaporan = [];
+
+        if (resSiswa.status === 'success') {
+          resSiswa.data.forEach(r => {
+            const nom = parseFloat(r.nominal) || 0;
+            totalMasuk += nom;
+            rawLaporan.push({
+              tanggal: r.tanggal,
+              sumber: 'Siswa',
+              keterangan: `${r.nama} (${r.nisn}) - ${r.pembayaran}`,
+              jenis: 'Pemasukan',
+              nominal: nom,
+              admin: r.admin
+            });
+          });
+        }
+
+        if (resInternal.status === 'success') {
+          resInternal.data.forEach(r => {
+            const nom = parseFloat(r.nominal) || 0;
+            if (r.jenis === 'Pemasukan') totalMasuk += nom; else totalKeluar += nom;
+            rawLaporan.push({
+              tanggal: r.tanggal,
+              sumber: 'Internal',
+              keterangan: r.keterangan,
+              jenis: r.jenis,
+              nominal: nom,
+              admin: r.admin
+            });
+          });
+        }
+
+        document.getElementById('total-pemasukan').textContent = formatRp(totalMasuk);
+        document.getElementById('total-pengeluaran').textContent = formatRp(totalKeluar);
+        document.getElementById('saldo-total').textContent = formatRp(totalMasuk - totalKeluar);
+
+        renderLaporan();
+      }).catch(() => {
+        tbody.innerHTML = '<tr><td colspan="6" class="empty-state">Gagal memuat data.</td></tr>';
+      });
+    }
+
+    function renderLaporan() {
+      const tbody = document.getElementById('tbody-laporan');
+      const jenisFilter = document.getElementById('jenis-laporan').value;
+      filteredLaporan = rawLaporan.filter(r => {
+        const matchesDate = inDateRange(r.tanggal, 'from-laporan', 'to-laporan');
+        const matchesJenis = !jenisFilter || r.jenis === jenisFilter;
+        return matchesDate && matchesJenis;
+      });
+
+      // Urutkan dari yang terbaru
+      filteredLaporan.sort((a, b) => {
+        const da = toComparableDate(a.tanggal);
+        const db = toComparableDate(b.tanggal);
+        if (!da || !db) return 0;
+        return db - da;
+      });
+
+      let periodeMasuk = 0, periodeKeluar = 0;
+      filteredLaporan.forEach(r => {
+        if (r.jenis === 'Pemasukan') periodeMasuk += r.nominal; else periodeKeluar += r.nominal;
+      });
+      document.getElementById('periode-pemasukan').textContent = formatRp(periodeMasuk);
+      document.getElementById('periode-pengeluaran').textContent = formatRp(periodeKeluar);
+      document.getElementById('periode-selisih').textContent = formatRp(periodeMasuk - periodeKeluar);
+
+      document.getElementById('count-laporan').textContent = `Menampilkan ${filteredLaporan.length} dari ${rawLaporan.length} transaksi`;
+
+      if (filteredLaporan.length > 0) {
+        tbody.innerHTML = filteredLaporan.map(r => {
+          const isMasuk = r.jenis === 'Pemasukan';
+          const badge = isMasuk ? '<span style="color:green;font-weight:bold;">(+) Pemasukan</span>' : '<span style="color:red;font-weight:bold;">(-) Pengeluaran</span>';
+          return `
+            <tr>
+              <td>${escapeHtml(r.tanggal)}</td>
+              <td>${escapeHtml(r.sumber)}</td>
+              <td>${escapeHtml(r.keterangan)}</td>
+              <td>${badge}</td>
+              <td style="font-weight:bold;">${formatRp(r.nominal)}</td>
+              <td>${escapeHtml(r.admin) || '-'}</td>
+            </tr>
+          `;
+        }).join('');
+      } else {
+        tbody.innerHTML = '<tr><td colspan="6" class="empty-state">Tidak ada data pada periode/filter ini.</td></tr>';
+      }
+    }
+
+    // Label periode untuk judul laporan (nama file & header PDF/Excel)
+    function getPeriodeLabel() {
+      const from = document.getElementById('from-laporan').value;
+      const to = document.getElementById('to-laporan').value;
+      if (!from && !to) return 'Semua Periode';
+      const fmt = (s) => { const d = new Date(s); return isNaN(d) ? s : d.toLocaleDateString('id-ID'); };
+      if (from && to) return `${fmt(from)} - ${fmt(to)}`;
+      if (from) return `Mulai ${fmt(from)}`;
+      return `Sampai ${fmt(to)}`;
+    }
+
+    function exportLaporanExcel() {
+      if (!filteredLaporan || filteredLaporan.length === 0) { alert('Tidak ada data untuk diekspor.'); return; }
+      if (typeof XLSX === 'undefined') { alert('Library Excel belum termuat. Periksa koneksi internet lalu coba lagi.'); return; }
+
+      const rows = filteredLaporan.map(r => ({
+        'Tanggal': r.tanggal,
+        'Sumber': r.sumber,
+        'Keterangan': r.keterangan,
+        'Jenis': r.jenis,
+        'Nominal (Rp)': r.nominal,
+        'Petugas': r.admin || '-'
+      }));
+
+      const ws = XLSX.utils.json_to_sheet(rows);
+      ws['!cols'] = [{ wch: 12 }, { wch: 10 }, { wch: 35 }, { wch: 14 }, { wch: 14 }, { wch: 15 }];
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, 'Laporan');
+      XLSX.writeFile(wb, `Laporan-Keuangan-${getPeriodeLabel().replace(/[\/\s]/g, '_')}.xlsx`);
+    }
+
+    function exportLaporanPDF() {
+      if (!filteredLaporan || filteredLaporan.length === 0) { alert('Tidak ada data untuk diekspor.'); return; }
+      if (typeof window.jspdf === 'undefined') { alert('Library PDF belum termuat. Periksa koneksi internet lalu coba lagi.'); return; }
+
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({ orientation: 'landscape' });
+
+      doc.setFontSize(14);
+      doc.text('Laporan Transaksi Keuangan - MTs Al-Fatah', 14, 15);
+      doc.setFontSize(10);
+      doc.text(`Periode: ${getPeriodeLabel()}`, 14, 22);
+      doc.text(`Dicetak: ${new Date().toLocaleString('id-ID')}`, 14, 27);
+
+      let periodeMasuk = 0, periodeKeluar = 0;
+      filteredLaporan.forEach(r => { if (r.jenis === 'Pemasukan') periodeMasuk += r.nominal; else periodeKeluar += r.nominal; });
+
+      doc.autoTable({
+        startY: 33,
+        head: [['Tanggal', 'Sumber', 'Keterangan', 'Jenis', 'Nominal', 'Petugas']],
+        body: filteredLaporan.map(r => [
+          r.tanggal,
+          r.sumber,
+          r.keterangan,
+          r.jenis,
+          formatRp(r.nominal),
+          r.admin || '-'
+        ]),
+        styles: { fontSize: 8 },
+        headStyles: { fillColor: [13, 110, 253] },
+        foot: [['', '', '', 'Total Pemasukan', formatRp(periodeMasuk), ''], ['', '', '', 'Total Pengeluaran', formatRp(periodeKeluar), '']],
+        footStyles: { fillColor: [244, 246, 249], textColor: [51, 51, 51], fontStyle: 'bold' }
+      });
+
+      doc.save(`Laporan-Keuangan-${getPeriodeLabel().replace(/[\/\s]/g, '_')}.pdf`);
+    }
+
+    // --- MODAL INPUT PEMBAYARAN SISWA: dropdown siswa & jenis pembayaran ---
+
+    // Ambil daftar siswa (dari sheet Akun, role = Siswa) dan daftar tarif terbaru,
+    // lalu panggil callback. Dipanggil setiap modal dibuka supaya datanya selalu terbaru.
+    function prepareTsModalData(callback) {
+      Promise.all([
+        fetch(scriptURL + '?action=getAccounts').then(r => r.json()),
+        fetch(scriptURL + '?action=getTarifPembayaran').then(r => r.json())
+      ]).then(([resAkun, resTarif]) => {
+        tsModalSiswaList = (resAkun.status === 'success') ? resAkun.data.filter(a => String(a.role).toLowerCase() === 'siswa') : [];
+        tsModalTarifList = (resTarif.status === 'success') ? resTarif.data : [];
+        callback();
+      }).catch(() => {
+        alert('Gagal memuat data siswa/tarif. Periksa koneksi Anda.');
+      });
+    }
+
+    // idLogin di sheet Akun dipakai sebagai NISN siswa.
+    function populateSiswaSelect(selectedNisn) {
+      const sel = document.getElementById('ts_siswaSelect');
+      const options = tsModalSiswaList.map(s => `
+        <option value="${escapeHtml(s.idLogin)}" data-nama="${escapeHtml(s.nama)}" data-kelas="${escapeHtml(s.kelas)}" ${String(s.idLogin) === String(selectedNisn) ? 'selected' : ''}>
+          ${escapeHtml(s.idLogin)} - ${escapeHtml(s.nama)} (${escapeHtml(s.kelas)})
+        </option>
+      `).join('');
+      sel.innerHTML = '<option value="">-- Pilih Siswa --</option>' + options;
+    }
+
+    // Menampilkan tarif untuk kelas siswa yang dipilih (atau "Semua Kelas"). Kalau data
+    // kelas siswa kosong/tidak cocok dengan tarif manapun (mis. kolom "kelas" di sheet Akun
+    // belum terisi), TIDAK diblokir — semua jenis pembayaran tetap ditampilkan supaya admin
+    // bisa memilih manual, bukan macet di placeholder.
+    // Jika transaksi lama memakai jenis pembayaran yang sudah tidak ada di tarif saat ini,
+    // opsi itu tetap ditambahkan supaya data lama tidak hilang saat diedit.
+    function populateJenisPembayaranSelect(kelas, selectedNama) {
+      const sel = document.getElementById('ts_pembayaran');
+      const kelasTrimmed = String(kelas || '').trim();
+      let filtered = tsModalTarifList;
+      if (kelasTrimmed) {
+        const matched = tsModalTarifList.filter(t =>
+          String(t.targetKelas).toLowerCase().trim() === kelasTrimmed.toLowerCase() ||
+          String(t.targetKelas).toLowerCase().includes('semua')
+        );
+        if (matched.length > 0) filtered = matched; // kalau tidak ada yang cocok, tetap tampilkan semua
+      }
+      let options = filtered.map(t => `
+        <option value="${escapeHtml(t.namaPembayaran)}" data-nominal="${t.nominalTarif}" ${t.namaPembayaran === selectedNama ? 'selected' : ''}>
+          ${escapeHtml(t.namaPembayaran)} — ${formatRp(t.nominalTarif)}
+        </option>
+      `).join('');
+      if (selectedNama && !filtered.some(t => t.namaPembayaran === selectedNama)) {
+        options += `<option value="${escapeHtml(selectedNama)}" selected>${escapeHtml(selectedNama)} (tidak ada di tarif saat ini)</option>`;
+      }
+      sel.innerHTML = '<option value="">-- Pilih Jenis Pembayaran --</option>' + options;
+    }
+
+    document.getElementById('ts_siswaSelect').addEventListener('change', function() {
+      if (!this.value) {
+        document.getElementById('ts_pembayaran').innerHTML = '<option value="">-- Pilih Siswa terlebih dahulu --</option>';
+        document.getElementById('ts_nominal').value = '';
+        return;
+      }
+      const opt = this.selectedOptions[0];
+      const kelas = opt ? opt.dataset.kelas : '';
+      populateJenisPembayaranSelect(kelas, '');
+      document.getElementById('ts_nominal').value = '';
+    });
+
+    document.getElementById('ts_pembayaran').addEventListener('change', function() {
+      const opt = this.selectedOptions[0];
+      if (opt && opt.dataset.nominal !== undefined) {
+        document.getElementById('ts_nominal').value = opt.dataset.nominal;
+      }
+    });
+
+    function openAddTsModal() {
+      prepareTsModalData(() => {
+        populateSiswaSelect('');
+        document.getElementById('ts_pembayaran').innerHTML = '<option value="">-- Pilih Siswa terlebih dahulu --</option>';
+        document.getElementById('modal-ts-title').textContent = 'Input Pembayaran Siswa';
+        openModal('modal-transaksi-siswa');
+      });
+    }
+
+    // --- EDIT (buka modal terisi) ---
+
+    function editTransaksiSiswa(sheetRow) {
+      const r = rawTs.find(x => x.sheetRow === sheetRow);
+      if (!r) return;
+      prepareTsModalData(() => {
+        populateSiswaSelect(r.nisn);
+        const matched = tsModalSiswaList.find(s => String(s.idLogin) === String(r.nisn));
+        const kelas = matched ? matched.kelas : '';
+        populateJenisPembayaranSelect(kelas, r.pembayaran);
+        document.getElementById('ts_sheetRow').value = sheetRow;
+        document.getElementById('ts_nominal').value = r.nominal;
+        document.getElementById('modal-ts-title').textContent = 'Edit Pembayaran Siswa';
+        openModal('modal-transaksi-siswa');
+      });
+    }
+
+    function deleteTransaksiSiswa(sheetRow) {
+      const r = rawTs.find(x => x.sheetRow === sheetRow);
+      if (!r) return;
+      if (!confirm(`Hapus transaksi ${r.nama} (${formatRp(r.nominal)})?`)) return;
+      submitData(null, null, null, { action: 'deleteTransaksiSiswa', sheetRow: sheetRow }, 'transaksi-siswa');
+    }
+
+    function editTransaksiInternal(sheetRow) {
+      const r = rawTi.find(x => x.sheetRow === sheetRow);
+      if (!r) return;
+      document.getElementById('ti_sheetRow').value = sheetRow;
+      document.getElementById('ti_jenis').value = r.jenis;
+      document.getElementById('ti_keterangan').value = r.keterangan;
+      document.getElementById('ti_nominal').value = r.nominal;
+      document.getElementById('modal-ti-title').textContent = 'Edit Transaksi Internal';
+      openModal('modal-transaksi-internal');
+    }
+
+    function deleteTransaksiInternal(sheetRow) {
+      const r = rawTi.find(x => x.sheetRow === sheetRow);
+      if (!r) return;
+      if (!confirm(`Hapus transaksi "${r.keterangan}" (${formatRp(r.nominal)})?`)) return;
+      submitData(null, null, null, { action: 'deleteTransaksiInternal', sheetRow: sheetRow }, 'transaksi-internal');
+    }
+
+    function editTarifPembayaran(sheetRow) {
+      const r = rawTp.find(x => x.sheetRow === sheetRow);
+      if (!r) return;
+      document.getElementById('tp_sheetRow').value = sheetRow;
+      document.getElementById('tp_nama').value = r.namaPembayaran;
+      document.getElementById('tp_kelas').value = r.targetKelas;
+      document.getElementById('tp_nominal').value = r.nominalTarif;
+      document.getElementById('modal-tp-title').textContent = 'Edit Tarif Pembayaran';
+      openModal('modal-jenis-pembayaran');
+    }
+
+    function deleteTarifPembayaran(sheetRow) {
+      const r = rawTp.find(x => x.sheetRow === sheetRow);
+      if (!r) return;
+      if (!confirm(`Hapus tarif "${r.namaPembayaran}" (${r.targetKelas})?`)) return;
+      submitData(null, null, null, { action: 'deleteTarifPembayaran', sheetRow: sheetRow }, 'jenis-pembayaran');
+    }
+
+    // --- SUBMIT (POST) ---
+    // formId/btnId/modalId are null for actions with no modal (e.g. delete)
+    function submitData(formId, btnId, modalId, payload, targetSection) {
+      const btn = btnId ? document.getElementById(btnId) : null;
+      const originalText = btn ? btn.textContent : null;
+      if (btn) { btn.textContent = 'Menyimpan...'; btn.disabled = true; }
+
+      fetch(scriptURL, { method: 'POST', body: JSON.stringify(payload) })
+        .then(r => r.json())
+        .then(data => {
+          if (btn) { btn.textContent = originalText; btn.disabled = false; }
+          if (data.status === 'success') {
+            if (formId) document.getElementById(formId).reset();
+            if (modalId) closeModal(modalId);
+            loadDataForSection(targetSection);
+          } else {
+            alert('Gagal: ' + data.message);
+          }
+        })
+        .catch(() => {
+          if (btn) { btn.textContent = originalText; btn.disabled = false; }
+          alert('Gagal terhubung ke jaringan/server.');
+        });
+    }
+
+    document.getElementById('form-ts').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const sheetRow = document.getElementById('ts_sheetRow').value;
+      const isEdit = sheetRow !== '';
+      const siswaOpt = document.getElementById('ts_siswaSelect').selectedOptions[0];
+      const nisn = document.getElementById('ts_siswaSelect').value;
+      const namaSiswa = siswaOpt ? siswaOpt.dataset.nama : '';
+      if (!nisn) { alert('Pilih siswa terlebih dahulu.'); return; }
+      submitData('form-ts', 'btn-ts', 'modal-transaksi-siswa', {
+        action: isEdit ? 'updateTransaksiSiswa' : 'addTransaksiSiswa',
+        sheetRow: isEdit ? Number(sheetRow) : undefined,
+        nisn: nisn,
+        namaSiswa: namaSiswa,
+        pembayaran: document.getElementById('ts_pembayaran').value,
+        nominal: document.getElementById('ts_nominal').value,
+        admin: session.nama
+      }, 'transaksi-siswa');
+    });
+
+    document.getElementById('form-ti').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const sheetRow = document.getElementById('ti_sheetRow').value;
+      const isEdit = sheetRow !== '';
+      submitData('form-ti', 'btn-ti', 'modal-transaksi-internal', {
+        action: isEdit ? 'updateTransaksiInternal' : 'addTransaksiInternal',
+        sheetRow: isEdit ? Number(sheetRow) : undefined,
+        jenis: document.getElementById('ti_jenis').value,
+        keterangan: document.getElementById('ti_keterangan').value,
+        nominal: document.getElementById('ti_nominal').value,
+        admin: session.nama
+      }, 'transaksi-internal');
+    });
+
+    document.getElementById('form-tp').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const sheetRow = document.getElementById('tp_sheetRow').value;
+      const isEdit = sheetRow !== '';
+      submitData('form-tp', 'btn-tp', 'modal-jenis-pembayaran', {
+        action: isEdit ? 'updateTarifPembayaran' : 'addTarifPembayaran',
+        sheetRow: isEdit ? Number(sheetRow) : undefined,
+        namaPembayaran: document.getElementById('tp_nama').value,
+        targetKelas: document.getElementById('tp_kelas').value,
+        nominalTarif: document.getElementById('tp_nominal').value
+      }, 'jenis-pembayaran');
+    });
+
+    document.getElementById('form-akun').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const sheetRow = document.getElementById('akun_sheetRow').value;
+      const isEdit = sheetRow !== '';
+      submitData('form-akun', 'btn-akun', 'modal-akun', {
+        action: isEdit ? 'updateAccount' : 'addAccount',
+        sheetRow: isEdit ? Number(sheetRow) : undefined,
+        role: document.getElementById('akun_role').value,
+        idLogin: document.getElementById('akun_idLogin').value,
+        nama: document.getElementById('akun_nama').value,
+        kelas: document.getElementById('akun_kelas').value,
+        password: document.getElementById('akun_password').value // kosong saat edit = password lama dipertahankan (ditangani backend)
+      }, 'manajemen-akun');
+    });
+
+    window.onload = function() {
+      loadTransaksiSiswa();
+    };
+  </script>
+</body>
+</html>
