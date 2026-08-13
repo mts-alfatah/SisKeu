@@ -106,6 +106,8 @@
     .form-group { margin-bottom: 15px; }
     label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 13px; }
     input, select { width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; box-sizing: border-box; }
+    select:disabled { background: #f1f3f5; color: var(--text-muted); }
+    .field-hint { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
     .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
     .btn-cancel { background: #6c757d; color: white; border: none; padding: 9px 15px; border-radius: 6px; cursor: pointer; }
     .btn-save { background: var(--success-color); color: white; border: none; padding: 9px 15px; border-radius: 6px; cursor: pointer; }
@@ -128,7 +130,6 @@
       <li class="nav-item" data-target="transaksi-internal"><a href="#">🔄 Transaksi Internal</a></li>
 
       <div class="menu-label">Pengaturan Pembayaran</div>
-      <li class="nav-item" data-target="nama-pembayaran"><a href="#">🏷️ Nama Pembayaran</a></li>
       <li class="nav-item" data-target="jenis-pembayaran"><a href="#">⚙️ Jenis & Tarif</a></li>
 
       <div class="menu-label">Laporan</div>
@@ -152,7 +153,7 @@
           <h3>Riwayat Pembayaran Siswa</h3>
           <div class="section-header-actions">
             <button class="btn-export" onclick="exportToCSV('ts')">⬇️ Export CSV</button>
-            <button class="btn-add" onclick="openModal('modal-transaksi-siswa')">+ Input Pembayaran</button>
+            <button class="btn-add" onclick="openAddTsModal()">+ Input Pembayaran</button>
           </div>
         </div>
         <div class="toolbar">
@@ -163,7 +164,7 @@
         </div>
         <div class="result-count" id="count-ts"></div>
         <table>
-          <thead><tr><th>Tanggal</th><th>Siswa</th><th>Pembayaran</th><th>Nominal</th><th>Petugas</th><th>Aksi</th></tr></thead>
+          <thead><tr><th>Tanggal</th><th>Siswa</th><th>Jenis Pembayaran</th><th>Nominal</th><th>Petugas</th><th>Aksi</th></tr></thead>
           <tbody id="tbody-transaksi-siswa"><tr><td colspan="6" style="text-align: center;">Memuat data...</td></tr></tbody>
         </table>
       </div>
@@ -198,29 +199,7 @@
       </div>
     </div>
 
-    <!-- 3. NAMA PEMBAYARAN -->
-    <div id="nama-pembayaran" class="page-section">
-      <div class="card-section">
-        <div class="section-header">
-          <h3>Daftar Kategori Pembayaran Utama</h3>
-          <div class="section-header-actions">
-            <button class="btn-export" onclick="exportToCSV('np')">⬇️ Export CSV</button>
-            <button class="btn-add" onclick="openModal('modal-nama-pembayaran')">+ Tambah Nama</button>
-          </div>
-        </div>
-        <div class="toolbar">
-          <input type="text" class="search-input" id="search-np" placeholder="🔍 Cari nama pembayaran..." oninput="renderNamaPembayaran()">
-          <button class="btn-clear-filter" onclick="clearFilter('np')">Reset Filter</button>
-        </div>
-        <div class="result-count" id="count-np"></div>
-        <table>
-          <thead><tr><th>ID</th><th>Nama Pembayaran</th><th>Keterangan</th><th>Aksi</th></tr></thead>
-          <tbody id="tbody-nama-pembayaran"><tr><td colspan="4" style="text-align: center;">Memuat data...</td></tr></tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- 4. JENIS & TARIF -->
+    <!-- 3. JENIS & TARIF -->
     <div id="jenis-pembayaran" class="page-section">
       <div class="card-section">
         <div class="section-header">
@@ -242,7 +221,7 @@
       </div>
     </div>
 
-    <!-- 5. LAPORAN TOTAL -->
+    <!-- 4. LAPORAN TOTAL -->
     <div id="laporan-total" class="page-section">
       <div class="info-cards">
         <div class="info-card success">
@@ -269,10 +248,23 @@
       <h3 id="modal-ts-title">Input Pembayaran Siswa</h3>
       <form id="form-ts">
         <input type="hidden" id="ts_sheetRow">
-        <div class="form-group"><label>NISN</label><input type="text" id="ts_nisn" required placeholder="Contoh: 0012345"></div>
-        <div class="form-group"><label>Nama Siswa</label><input type="text" id="ts_nama" required placeholder="Contoh: Budi Santoso"></div>
-        <div class="form-group"><label>Nama Pembayaran</label><input type="text" id="ts_pembayaran" required placeholder="Contoh: SPP Juli"></div>
-        <div class="form-group"><label>Nominal Bayar (Rp)</label><input type="number" id="ts_nominal" required placeholder="Contoh: 100000"></div>
+        <div class="form-group">
+          <label>Siswa (NISN - Nama)</label>
+          <select id="ts_siswaSelect" required>
+            <option value="">-- Pilih Siswa --</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Jenis Pembayaran</label>
+          <select id="ts_pembayaran" required>
+            <option value="">-- Pilih Siswa terlebih dahulu --</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Nominal Bayar (Rp)</label>
+          <input type="number" id="ts_nominal" required placeholder="Contoh: 100000">
+          <div class="field-hint">Terisi otomatis dari tarif, bisa diubah bila perlu (mis. bayar sebagian).</div>
+        </div>
         <div class="modal-actions">
           <button type="button" class="btn-cancel" onclick="closeModal('modal-transaksi-siswa')">Batal</button>
           <button type="submit" class="btn-save" id="btn-ts">Simpan</button>
@@ -298,21 +290,6 @@
         <div class="modal-actions">
           <button type="button" class="btn-cancel" onclick="closeModal('modal-transaksi-internal')">Batal</button>
           <button type="submit" class="btn-save" id="btn-ti">Simpan</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <div class="modal" id="modal-nama-pembayaran">
-    <div class="modal-content">
-      <h3 id="modal-np-title">Tambah Nama Pembayaran Utama</h3>
-      <form id="form-np">
-        <input type="hidden" id="np_sheetRow">
-        <div class="form-group"><label>Nama Pembayaran</label><input type="text" id="np_nama" required placeholder="Contoh: Uang Buku"></div>
-        <div class="form-group"><label>Keterangan</label><input type="text" id="np_ket" placeholder="Contoh: Pembelian LKS Semester 1"></div>
-        <div class="modal-actions">
-          <button type="button" class="btn-cancel" onclick="closeModal('modal-nama-pembayaran')">Batal</button>
-          <button type="submit" class="btn-save" id="btn-np">Simpan</button>
         </div>
       </form>
     </div>
@@ -399,15 +376,13 @@
       if (jenis) jenis.value = '';
       if (prefix === 'ts') renderTransaksiSiswa();
       if (prefix === 'ti') renderTransaksiInternal();
-      if (prefix === 'np') renderNamaPembayaran();
       if (prefix === 'tp') renderTarifPembayaran();
     }
 
     function exportToCSV(prefix) {
       const map = {
-        ts: { data: () => filteredTs, headers: ['Tanggal', 'NISN', 'Nama Siswa', 'Pembayaran', 'Nominal', 'Petugas'], rows: r => [r.tanggal, r.nisn, r.nama, r.pembayaran, r.nominal, r.admin] },
+        ts: { data: () => filteredTs, headers: ['Tanggal', 'NISN', 'Nama Siswa', 'Jenis Pembayaran', 'Nominal', 'Petugas'], rows: r => [r.tanggal, r.nisn, r.nama, r.pembayaran, r.nominal, r.admin] },
         ti: { data: () => filteredTi, headers: ['Tanggal', 'Jenis', 'Keterangan', 'Nominal', 'Petugas'], rows: r => [r.tanggal, r.jenis, r.keterangan, r.nominal, r.admin] },
-        np: { data: () => filteredNp, headers: ['ID', 'Nama Pembayaran', 'Keterangan'], rows: r => [r.id, r.namaPembayaran, r.keterangan] },
         tp: { data: () => filteredTp, headers: ['Nama Pembayaran', 'Untuk Kelas', 'Nominal Tarif'], rows: r => [r.namaPembayaran, r.targetKelas, r.nominalTarif] }
       };
       const cfg = map[prefix];
@@ -437,9 +412,13 @@
     function openModal(id) { document.getElementById(id).classList.add('active'); }
     function closeModal(id) {
       document.getElementById(id).classList.remove('active');
-      if (id === 'modal-transaksi-siswa') { document.getElementById('form-ts').reset(); document.getElementById('ts_sheetRow').value = ''; document.getElementById('modal-ts-title').textContent = 'Input Pembayaran Siswa'; }
+      if (id === 'modal-transaksi-siswa') {
+        document.getElementById('form-ts').reset();
+        document.getElementById('ts_sheetRow').value = '';
+        document.getElementById('ts_pembayaran').innerHTML = '<option value="">-- Pilih Siswa terlebih dahulu --</option>';
+        document.getElementById('modal-ts-title').textContent = 'Input Pembayaran Siswa';
+      }
       if (id === 'modal-transaksi-internal') { document.getElementById('form-ti').reset(); document.getElementById('ti_sheetRow').value = ''; document.getElementById('modal-ti-title').textContent = 'Input Transaksi Internal'; }
-      if (id === 'modal-nama-pembayaran') { document.getElementById('form-np').reset(); document.getElementById('np_sheetRow').value = ''; document.getElementById('modal-np-title').textContent = 'Tambah Nama Pembayaran Utama'; }
       if (id === 'modal-jenis-pembayaran') { document.getElementById('form-tp').reset(); document.getElementById('tp_sheetRow').value = ''; document.getElementById('modal-tp-title').textContent = 'Pengaturan Tarif Pembayaran'; }
     }
 
@@ -463,19 +442,21 @@
     function loadDataForSection(sectionId) {
       if (sectionId === 'transaksi-siswa') loadTransaksiSiswa();
       if (sectionId === 'transaksi-internal') loadTransaksiInternal();
-      if (sectionId === 'nama-pembayaran') loadNamaPembayaran();
       if (sectionId === 'jenis-pembayaran') loadTarifPembayaran();
       if (sectionId === 'laporan-total') loadLaporanTotal();
     }
 
     // --- DATA STORES ---
-    // Every record from the backend now carries a "sheetRow" field: the real row
-    // number in the Google Sheet. This is the key used for edit/delete, since the
-    // displayed order (data.reverse() on the backend) does not match sheet order.
+    // Setiap record dari backend membawa "sheetRow": nomor baris asli di Google Sheet.
+    // Ini dipakai sebagai kunci edit/hapus karena urutan tampilan (data.reverse() di backend)
+    // tidak sama dengan urutan baris di sheet.
     let rawTs = [], filteredTs = [];
     let rawTi = [], filteredTi = [];
-    let rawNp = [], filteredNp = [];
     let rawTp = [], filteredTp = [];
+
+    // Data untuk dropdown pada modal Input Pembayaran Siswa
+    let tsModalSiswaList = [];
+    let tsModalTarifList = [];
 
     function loadTransaksiSiswa() {
       const tbody = document.getElementById('tbody-transaksi-siswa');
@@ -561,39 +542,6 @@
       }
     }
 
-    function loadNamaPembayaran() {
-      const tbody = document.getElementById('tbody-nama-pembayaran');
-      tbody.innerHTML = '<tr><td colspan="4" style="text-align: center;">⏳ Memuat data...</td></tr>';
-      fetch(scriptURL + '?action=getNamaPembayaran')
-        .then(r => r.json())
-        .then(res => { rawNp = (res.status === 'success') ? res.data : []; renderNamaPembayaran(); })
-        .catch(() => { tbody.innerHTML = '<tr><td colspan="4" class="empty-state">Gagal memuat data.</td></tr>'; });
-    }
-
-    function renderNamaPembayaran() {
-      const tbody = document.getElementById('tbody-nama-pembayaran');
-      const q = (document.getElementById('search-np').value || '').toLowerCase().trim();
-      filteredNp = rawNp.filter(r => !q || String(r.namaPembayaran || '').toLowerCase().includes(q));
-      document.getElementById('count-np').textContent = `Menampilkan ${filteredNp.length} dari ${rawNp.length} kategori`;
-      if (filteredNp.length > 0) {
-        tbody.innerHTML = filteredNp.map(r => `
-          <tr>
-            <td><code>${escapeHtml(r.id)}</code></td>
-            <td><strong>${escapeHtml(r.namaPembayaran)}</strong></td>
-            <td>${escapeHtml(r.keterangan) || '-'}</td>
-            <td>
-              <div class="row-actions">
-                <button class="btn-icon btn-edit" onclick="editNamaPembayaran(${r.sheetRow})">✏️ Edit</button>
-                <button class="btn-icon btn-delete" onclick="deleteNamaPembayaran(${r.sheetRow})">🗑️ Hapus</button>
-              </div>
-            </td>
-          </tr>
-        `).join('');
-      } else {
-        tbody.innerHTML = '<tr><td colspan="4" class="empty-state">Tidak ada data yang cocok.</td></tr>';
-      }
-    }
-
     function loadTarifPembayaran() {
       const tbody = document.getElementById('tbody-tarif-pembayaran');
       tbody.innerHTML = '<tr><td colspan="4" style="text-align: center;">⏳ Memuat data...</td></tr>';
@@ -647,18 +595,96 @@
       });
     }
 
+    // --- MODAL INPUT PEMBAYARAN SISWA: dropdown siswa & jenis pembayaran ---
+
+    // Ambil daftar siswa (dari sheet Akun, role = Siswa) dan daftar tarif terbaru,
+    // lalu panggil callback. Dipanggil setiap modal dibuka supaya datanya selalu terbaru.
+    function prepareTsModalData(callback) {
+      Promise.all([
+        fetch(scriptURL + '?action=getAccounts').then(r => r.json()),
+        fetch(scriptURL + '?action=getTarifPembayaran').then(r => r.json())
+      ]).then(([resAkun, resTarif]) => {
+        tsModalSiswaList = (resAkun.status === 'success') ? resAkun.data.filter(a => String(a.role).toLowerCase() === 'siswa') : [];
+        tsModalTarifList = (resTarif.status === 'success') ? resTarif.data : [];
+        callback();
+      }).catch(() => {
+        alert('Gagal memuat data siswa/tarif. Periksa koneksi Anda.');
+      });
+    }
+
+    // idLogin di sheet Akun dipakai sebagai NISN siswa.
+    function populateSiswaSelect(selectedNisn) {
+      const sel = document.getElementById('ts_siswaSelect');
+      const options = tsModalSiswaList.map(s => `
+        <option value="${escapeHtml(s.idLogin)}" data-nama="${escapeHtml(s.nama)}" data-kelas="${escapeHtml(s.kelas)}" ${String(s.idLogin) === String(selectedNisn) ? 'selected' : ''}>
+          ${escapeHtml(s.idLogin)} - ${escapeHtml(s.nama)} (${escapeHtml(s.kelas)})
+        </option>
+      `).join('');
+      sel.innerHTML = '<option value="">-- Pilih Siswa --</option>' + options;
+    }
+
+    // Menampilkan hanya tarif untuk kelas siswa yang dipilih (atau "Semua Kelas").
+    // Jika transaksi lama memakai jenis pembayaran yang sudah tidak ada di tarif saat ini,
+    // opsi itu tetap ditambahkan supaya data lama tidak hilang saat diedit.
+    function populateJenisPembayaranSelect(kelas, selectedNama) {
+      const sel = document.getElementById('ts_pembayaran');
+      if (!kelas) {
+        sel.innerHTML = '<option value="">-- Pilih Siswa terlebih dahulu --</option>';
+        return;
+      }
+      const filtered = tsModalTarifList.filter(t =>
+        String(t.targetKelas).toLowerCase() === String(kelas).toLowerCase() ||
+        String(t.targetKelas).toLowerCase().includes('semua')
+      );
+      let options = filtered.map(t => `
+        <option value="${escapeHtml(t.namaPembayaran)}" data-nominal="${t.nominalTarif}" ${t.namaPembayaran === selectedNama ? 'selected' : ''}>
+          ${escapeHtml(t.namaPembayaran)} — ${formatRp(t.nominalTarif)}
+        </option>
+      `).join('');
+      if (selectedNama && !filtered.some(t => t.namaPembayaran === selectedNama)) {
+        options += `<option value="${escapeHtml(selectedNama)}" selected>${escapeHtml(selectedNama)} (tidak ada di tarif saat ini)</option>`;
+      }
+      sel.innerHTML = '<option value="">-- Pilih Jenis Pembayaran --</option>' + options;
+    }
+
+    document.getElementById('ts_siswaSelect').addEventListener('change', function() {
+      const opt = this.selectedOptions[0];
+      const kelas = opt ? opt.dataset.kelas : '';
+      populateJenisPembayaranSelect(kelas, '');
+      document.getElementById('ts_nominal').value = '';
+    });
+
+    document.getElementById('ts_pembayaran').addEventListener('change', function() {
+      const opt = this.selectedOptions[0];
+      if (opt && opt.dataset.nominal !== undefined) {
+        document.getElementById('ts_nominal').value = opt.dataset.nominal;
+      }
+    });
+
+    function openAddTsModal() {
+      prepareTsModalData(() => {
+        populateSiswaSelect('');
+        populateJenisPembayaranSelect('', '');
+        document.getElementById('modal-ts-title').textContent = 'Input Pembayaran Siswa';
+        openModal('modal-transaksi-siswa');
+      });
+    }
+
     // --- EDIT (buka modal terisi) ---
 
     function editTransaksiSiswa(sheetRow) {
       const r = rawTs.find(x => x.sheetRow === sheetRow);
       if (!r) return;
-      document.getElementById('ts_sheetRow').value = sheetRow;
-      document.getElementById('ts_nisn').value = r.nisn;
-      document.getElementById('ts_nama').value = r.nama;
-      document.getElementById('ts_pembayaran').value = r.pembayaran;
-      document.getElementById('ts_nominal').value = r.nominal;
-      document.getElementById('modal-ts-title').textContent = 'Edit Pembayaran Siswa';
-      openModal('modal-transaksi-siswa');
+      prepareTsModalData(() => {
+        populateSiswaSelect(r.nisn);
+        const matched = tsModalSiswaList.find(s => String(s.idLogin) === String(r.nisn));
+        const kelas = matched ? matched.kelas : '';
+        populateJenisPembayaranSelect(kelas, r.pembayaran);
+        document.getElementById('ts_sheetRow').value = sheetRow;
+        document.getElementById('ts_nominal').value = r.nominal;
+        document.getElementById('modal-ts-title').textContent = 'Edit Pembayaran Siswa';
+        openModal('modal-transaksi-siswa');
+      });
     }
 
     function deleteTransaksiSiswa(sheetRow) {
@@ -684,23 +710,6 @@
       if (!r) return;
       if (!confirm(`Hapus transaksi "${r.keterangan}" (${formatRp(r.nominal)})?`)) return;
       submitData(null, null, null, { action: 'deleteTransaksiInternal', sheetRow: sheetRow }, 'transaksi-internal');
-    }
-
-    function editNamaPembayaran(sheetRow) {
-      const r = rawNp.find(x => x.sheetRow === sheetRow);
-      if (!r) return;
-      document.getElementById('np_sheetRow').value = sheetRow;
-      document.getElementById('np_nama').value = r.namaPembayaran;
-      document.getElementById('np_ket').value = r.keterangan || '';
-      document.getElementById('modal-np-title').textContent = 'Edit Nama Pembayaran';
-      openModal('modal-nama-pembayaran');
-    }
-
-    function deleteNamaPembayaran(sheetRow) {
-      const r = rawNp.find(x => x.sheetRow === sheetRow);
-      if (!r) return;
-      if (!confirm(`Hapus kategori "${r.namaPembayaran}"?`)) return;
-      submitData(null, null, null, { action: 'deleteNamaPembayaran', sheetRow: sheetRow }, 'nama-pembayaran');
     }
 
     function editTarifPembayaran(sheetRow) {
@@ -750,11 +759,15 @@
       e.preventDefault();
       const sheetRow = document.getElementById('ts_sheetRow').value;
       const isEdit = sheetRow !== '';
+      const siswaOpt = document.getElementById('ts_siswaSelect').selectedOptions[0];
+      const nisn = document.getElementById('ts_siswaSelect').value;
+      const namaSiswa = siswaOpt ? siswaOpt.dataset.nama : '';
+      if (!nisn) { alert('Pilih siswa terlebih dahulu.'); return; }
       submitData('form-ts', 'btn-ts', 'modal-transaksi-siswa', {
         action: isEdit ? 'updateTransaksiSiswa' : 'addTransaksiSiswa',
         sheetRow: isEdit ? Number(sheetRow) : undefined,
-        nisn: document.getElementById('ts_nisn').value,
-        namaSiswa: document.getElementById('ts_nama').value,
+        nisn: nisn,
+        namaSiswa: namaSiswa,
         pembayaran: document.getElementById('ts_pembayaran').value,
         nominal: document.getElementById('ts_nominal').value,
         admin: session.nama
@@ -773,18 +786,6 @@
         nominal: document.getElementById('ti_nominal').value,
         admin: session.nama
       }, 'transaksi-internal');
-    });
-
-    document.getElementById('form-np').addEventListener('submit', function(e) {
-      e.preventDefault();
-      const sheetRow = document.getElementById('np_sheetRow').value;
-      const isEdit = sheetRow !== '';
-      submitData('form-np', 'btn-np', 'modal-nama-pembayaran', {
-        action: isEdit ? 'updateNamaPembayaran' : 'addNamaPembayaran',
-        sheetRow: isEdit ? Number(sheetRow) : undefined,
-        namaPembayaran: document.getElementById('np_nama').value,
-        keterangan: document.getElementById('np_ket').value
-      }, 'nama-pembayaran');
     });
 
     document.getElementById('form-tp').addEventListener('submit', function(e) {
