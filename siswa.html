@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tagihan Saya - SisKeu MTs Al-Fatah</title>
+  <style>
+    :root {
+      --primary-color: #0d6efd;
+      --primary-hover: #0b5ed7;
+      --bg-color: #f8f9fa;
+      --card-bg: #ffffff;
+      --text-main: #333333;
+      --text-muted: #6c757d;
+      --border-color: #dee2e6;
+      --success: #198754;
+      --success-bg: #e9f7ef;
+      --danger: #dc3545;
+      --danger-bg: #fdecea;
+      --warning: #fd7e14;
+      --warning-bg: #fff4e8;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      min-height: 100vh;
+    }
+
+    .topbar {
+      background: var(--card-bg);
+      border-bottom: 1px solid var(--border-color);
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .topbar-left { display: flex; align-items: center; gap: 10px; }
+
+    .topbar-left img {
+      width: 34px; height: 34px; border-radius: 50%;
+      background: #e9ecef; object-fit: contain; padding: 3px;
+    }
+
+    .topbar-title { font-size: 14px; font-weight: 700; }
+    .topbar-title span { display: block; font-size: 11px; font-weight: 400; color: var(--text-muted); }
+
+    .btn-logout {
+      border: 1px solid var(--border-color);
+      background: #fff; color: var(--text-muted);
+      padding: 7px 14px; border-radius: 8px;
+      font-size: 13px; cursor: pointer; font-weight: 600;
+    }
+    .btn-logout:hover { border-color: var(--danger); color: var(--danger); }
+
+    .container { max-width: 720px; margin: 0 auto; padding: 20px; }
+
+    .profile-card {
+      background: var(--card-bg);
+      border-radius: 16px; padding: 18px 20px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.05);
+      margin-bottom: 18px;
+      display: flex; align-items: center; gap: 14px;
+    }
+
+    .avatar {
+      width: 48px; height: 48px; border-radius: 50%;
+      background: var(--primary-color); color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 18px; flex-shrink: 0;
+    }
+
+    .profile-name { font-size: 15px; font-weight: 700; }
+    .profile-meta { font-size: 12.5px; color: var(--text-muted); margin-top: 2px; }
+
+    .summary-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 10px; margin-bottom: 18px;
+    }
+
+    .summary-box {
+      background: var(--card-bg); border-radius: 12px;
+      padding: 14px 10px; text-align: center;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+    }
+
+    .summary-value { font-size: 18px; font-weight: 700; }
+    .summary-label { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+    .summary-box.lunas .summary-value { color: var(--success); }
+    .summary-box.belum .summary-value { color: var(--danger); }
+
+    .section-title {
+      font-size: 14px; font-weight: 700;
+      margin: 22px 0 10px 2px; color: var(--text-main);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .section-title:first-of-type { margin-top: 4px; }
+
+    .bill-card {
+      background: var(--card-bg); border-radius: 14px; padding: 16px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+      margin-bottom: 12px;
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    }
+
+    .bill-left { display: flex; align-items: flex-start; gap: 12px; min-width: 0; }
+
+    .bill-icon {
+      width: 38px; height: 38px; border-radius: 10px;
+      background: #f1f4f8; display: flex; align-items: center; justify-content: center;
+      font-size: 17px; flex-shrink: 0;
+    }
+
+    .bill-name { font-size: 14px; font-weight: 700; }
+    .bill-sub { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+
+    .bill-right { text-align: right; flex-shrink: 0; }
+    .bill-amount { font-size: 14px; font-weight: 700; }
+    .bill-paid { font-size: 11.5px; color: var(--text-muted); margin-top: 1px; }
+
+    .badge {
+      display: inline-block; margin-top: 5px;
+      padding: 3px 10px; border-radius: 999px;
+      font-size: 11px; font-weight: 700;
+    }
+    .badge.lunas { background: var(--success-bg); color: var(--success); }
+    .badge.belum { background: var(--danger-bg); color: var(--danger); }
+    .badge.cicil { background: var(--warning-bg); color: var(--warning); }
+
+    /* Riwayat pembayaran */
+    .history-row {
+      background: var(--card-bg);
+      border-radius: 12px;
+      padding: 12px 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+      margin-bottom: 8px;
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 10px;
+      font-size: 13px;
+    }
+    .history-left .h-jenis { font-weight: 600; }
+    .history-left .h-tanggal { color: var(--text-muted); font-size: 11.5px; margin-top: 2px; }
+    .history-right { font-weight: 700; color: var(--success); flex-shrink: 0; }
+
+    .state-box { text-align: center; padding: 40px 20px; color: var(--text-muted); font-size: 13px; }
+
+    .spinner {
+      width: 26px; height: 26px;
+      border: 3px solid var(--border-color); border-top-color: var(--primary-color);
+      border-radius: 50%; margin: 0 auto 12px;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .btn-retry {
+      margin-top: 10px;
+      border: 1px solid var(--primary-color); background: #fff; color: var(--primary-color);
+      padding: 7px 16px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer;
+    }
+
+    #billList, #historyList { display: none; }
+  </style>
+</head>
+<body>
+
+  <div class="topbar">
+    <div class="topbar-left">
+      <img src="logo.png" alt="Logo Sekolah" onerror="this.style.display='none'">
+      <div class="topbar-title">
+        SisKeu MTs Al-Fatah
+        <span>Tagihan Siswa</span>
+      </div>
+    </div>
+    <button class="btn-logout" onclick="logout()">Keluar</button>
+  </div>
+
+  <div class="container">
+
+    <div class="profile-card">
+      <div class="avatar" id="avatarInitial">?</div>
+      <div>
+        <div class="profile-name" id="studentName">Memuat...</div>
+        <div class="profile-meta" id="studentMeta">-</div>
+      </div>
+    </div>
+
+    <div class="summary-grid">
+      <div class="summary-box">
+        <div class="summary-value" id="sumTotal">-</div>
+        <div class="summary-label">Total Tagihan</div>
+      </div>
+      <div class="summary-box lunas">
+        <div class="summary-value" id="sumLunas">-</div>
+        <div class="summary-label">Sudah Lunas</div>
+      </div>
+      <div class="summary-box belum">
+        <div class="summary-value" id="sumBelum">-</div>
+        <div class="summary-label">Belum Lunas</div>
+      </div>
+    </div>
+
+    <div id="loadingState" class="state-box">
+      <div class="spinner"></div>
+      Memuat data tagihan...
+    </div>
+
+    <div id="errorState" class="state-box" style="display:none;">
+      Gagal memuat data tagihan.<br>
+      <button class="btn-retry" onclick="loadData()">Coba Lagi</button>
+    </div>
+
+    <div id="content" style="display:none;">
+      <div class="section-title">Jenis Tagihan</div>
+      <div id="emptyBillState" class="state-box" style="display:none;">
+        Belum ada tarif pembayaran untuk kelasmu.
+      </div>
+      <div id="billList"></div>
+
+      <div class="section-title">Riwayat Pembayaran</div>
+      <div id="emptyHistoryState" class="state-box" style="display:none;">
+        Belum ada riwayat pembayaran.
+      </div>
+      <div id="historyList"></div>
+    </div>
+
+  </div>
+
+<script>
+  // Endpoint Apps Script yang sama dengan halaman login.
+  const scriptURL = 'https://script.google.com/macros/s/AKfycbzneHDGHeaJrXWBbbGL4Vz_5LXp2hpU4kV3DGtDTWoErUCHBZ9wbTpZkOvO1dBodObPPA/exec';
+
+  const iconMap = {
+    spp: '📘', seragam: '👕', buku: '📚', kegiatan: '🎒',
+    ujian: '📝', infaq: '🕌', gedung: '🏫', daftar: '🗂️', default: '💳'
+  };
+
+  function getIcon(jenis) {
+    const key = String(jenis || '').toLowerCase();
+    for (const k in iconMap) {
+      if (key.includes(k)) return iconMap[k];
+    }
+    return iconMap.default;
+  }
+
+  // Nominal dari getDisplayValues bisa berupa teks berformat ("Rp 50.000", "50000", dst).
+  function parseNominal(val) {
+    if (val === null || val === undefined) return 0;
+    const cleaned = String(val).replace(/[^0-9-]/g, '');
+    const n = parseInt(cleaned, 10);
+    return isNaN(n) ? 0 : n;
+  }
+
+  function formatRupiah(angka) {
+    const n = Number(angka) || 0;
+    return 'Rp' + n.toLocaleString('id-ID');
+  }
+
+  function norm(str) {
+    return String(str || '').trim().toLowerCase();
+  }
+
+  function logout() {
+    localStorage.removeItem('userSession');
+    window.location.href = 'index.html';
+  }
+
+  // Sesi login siswa (disimpan oleh index.html saat login).
+  // Struktur dari backend: { role, nama, id, kelas } — "id" berisi NISN siswa.
+  let session = null;
+  try {
+    session = JSON.parse(localStorage.getItem('userSession'));
+  } catch (e) {
+    session = null;
+  }
+
+  if (!session || norm(session.role) !== 'siswa') {
+    window.location.href = 'index.html';
+  } else {
+    document.getElementById('studentName').textContent = session.nama || 'Siswa';
+    document.getElementById('studentMeta').textContent =
+      (session.kelas ? 'Kelas ' + session.kelas : '') +
+      (session.id ? ' • NISN ' + session.id : '');
+    const initial = (session.nama || 'S').trim().charAt(0).toUpperCase();
+    document.getElementById('avatarInitial').textContent = initial;
+  }
+
+  function fetchAction(action) {
+    return fetch(scriptURL + '?action=' + encodeURIComponent(action), { method: 'GET' })
+      .then(res => {
+        if (!res.ok) throw new Error('Gagal terhubung ke server.');
+        return res.json();
+      })
+      .then(json => {
+        if (json.status !== 'success') throw new Error(json.message || 'Gagal memuat data.');
+        return json.data || [];
+      });
+  }
+
+  function loadData() {
+    document.getElementById('loadingState').style.display = 'block';
+    document.getElementById('errorState').style.display = 'none';
+    document.getElementById('content').style.display = 'none';
+
+    Promise.all([
+      fetchAction('getTarifPembayaran'),
+      fetchAction('getTransaksiSiswa')
+    ])
+      .then(([tarifList, transaksiList]) => {
+        document.getElementById('loadingState').style.display = 'none';
+        document.getElementById('content').style.display = 'block';
+        render(tarifList, transaksiList);
+      })
+      .catch(err => {
+        console.error('Error:', err);
+        document.getElementById('loadingState').style.display = 'none';
+        document.getElementById('errorState').style.display = 'block';
+      });
+  }
+
+  function render(tarifList, transaksiList) {
+    const myNisn = norm(session.id);
+    const myKelas = norm(session.kelas);
+
+    // Transaksi milik siswa yang login saja
+    const myTransaksi = transaksiList.filter(t => norm(t.nisn) === myNisn);
+
+    // Tarif yang berlaku untuk kelas siswa ini (kosong/"semua" berarti berlaku untuk semua kelas)
+    const myTarif = tarifList.filter(t => {
+      const target = norm(t.targetKelas);
+      return target === myKelas || target === '' || target === 'semua' || target === 'all';
+    });
+
+    // --- Jenis Tagihan (tarif vs total dibayar) ---
+    const billListEl = document.getElementById('billList');
+    billListEl.innerHTML = '';
+    let lunasCount = 0, belumCount = 0;
+
+    if (myTarif.length === 0) {
+      document.getElementById('emptyBillState').style.display = 'block';
+    } else {
+      document.getElementById('emptyBillState').style.display = 'none';
+
+      myTarif.forEach(tarif => {
+        const tarifAmount = parseNominal(tarif.nominalTarif);
+        const dibayar = myTransaksi
+          .filter(t => norm(t.pembayaran) === norm(tarif.namaPembayaran))
+          .reduce((sum, t) => sum + parseNominal(t.nominal), 0);
+
+        let statusLabel, statusCls;
+        if (tarifAmount > 0 && dibayar >= tarifAmount) {
+          statusLabel = 'Lunas'; statusCls = 'lunas'; lunasCount++;
+        } else if (dibayar > 0) {
+          statusLabel = 'Dicicil'; statusCls = 'cicil'; belumCount++;
+        } else {
+          statusLabel = 'Belum Dibayar'; statusCls = 'belum'; belumCount++;
+        }
+
+        const item = document.createElement('div');
+        item.className = 'bill-card';
+        item.innerHTML = `
+          <div class="bill-left">
+            <div class="bill-icon">${getIcon(tarif.namaPembayaran)}</div>
+            <div>
+              <div class="bill-name">${tarif.namaPembayaran || 'Tagihan'}</div>
+              <div class="bill-sub">Tarif: ${formatRupiah(tarifAmount)}</div>
+            </div>
+          </div>
+          <div class="bill-right">
+            <div class="bill-amount">${formatRupiah(dibayar)}</div>
+            <div class="bill-paid">dari ${formatRupiah(tarifAmount)}</div>
+            <span class="badge ${statusCls}">${statusLabel}</span>
+          </div>
+        `;
+        billListEl.appendChild(item);
+      });
+      billListEl.style.display = 'block';
+    }
+
+    document.getElementById('sumTotal').textContent = myTarif.length;
+    document.getElementById('sumLunas').textContent = lunasCount;
+    document.getElementById('sumBelum').textContent = belumCount;
+
+    // --- Riwayat Pembayaran (semua transaksi siswa, terbaru di atas) ---
+    const historyListEl = document.getElementById('historyList');
+    historyListEl.innerHTML = '';
+
+    if (myTransaksi.length === 0) {
+      document.getElementById('emptyHistoryState').style.display = 'block';
+    } else {
+      document.getElementById('emptyHistoryState').style.display = 'none';
+      myTransaksi.forEach(t => {
+        const row = document.createElement('div');
+        row.className = 'history-row';
+        row.innerHTML = `
+          <div class="history-left">
+            <div class="h-jenis">${t.pembayaran || '-'}</div>
+            <div class="h-tanggal">${t.tanggal || ''}</div>
+          </div>
+          <div class="history-right">${formatRupiah(parseNominal(t.nominal))}</div>
+        `;
+        historyListEl.appendChild(row);
+      });
+      historyListEl.style.display = 'block';
+    }
+  }
+
+  if (session) {
+    loadData();
+  }
+</script>
+
+</body>
+</html>
