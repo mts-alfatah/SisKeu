@@ -9,13 +9,14 @@ if ('serviceWorker' in navigator) {
   });
 }
 
-// Logika Tombol Hamburger Menu (HP)
+// Logika Tombol Hamburger Menu (HP) - PERBAIKAN DI SINI
 document.addEventListener('DOMContentLoaded', () => {
   const menuToggle = document.getElementById('menuToggle');
   const sidebar = document.querySelector('.sidebar');
   
   if (menuToggle && sidebar) {
-    menuToggle.addEventListener('click', () => {
+    menuToggle.addEventListener('click', (e) => {
+      e.stopPropagation(); // 👈 Mencegah bubbling agar sidebar tidak langsung tertutup kembali
       sidebar.classList.toggle('open');
     });
 
@@ -124,7 +125,6 @@ if (loginForm) {
     });
   });
 }
-
 
 // ===================================================
 // 2. LOGIKA HALAMAN DASHBOARD ADMIN
