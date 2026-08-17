@@ -51,44 +51,48 @@
       </div>
     </div>
 
-    <!-- 1. TRANSAKSI SISWA -->
-    <div id="transaksi-siswa" class="page-section active">
-      <div class="card-section">
-        <div class="section-header">
-          <h3>Riwayat Pembayaran Siswa</h3>
-          <div class="section-header-actions">
-            <button class="btn-add" onclick="openAddTsModal()">+ Input Pembayaran</button>
-          </div>
-        </div>
-        <div class="toolbar">
-          <input type="text" class="search-input" id="search-ts" placeholder="🔍 Cari nama siswa, NISN, kelas, atau jenis pembayaran..." oninput="renderTransaksiSiswa()">
-          <input type="date" class="date-input" id="from-ts" onchange="renderTransaksiSiswa()">
-          <input type="date" class="date-input" id="to-ts" onchange="renderTransaksiSiswa()">
-          <button class="btn-clear-filter" onclick="clearFilter('ts')">Reset Filter</button>
-        </div>
-        <div class="result-count" id="count-ts"></div>
+    <!-- ========================================== -->
+    <!-- TAB TRANSAKSI SISWA (Preview Dihilangkan)   -->
+    <!-- ========================================== -->
+    <div id="transaksi-siswa" class="tab-content active" style="display: block;">
+      <h2>Data Transaksi Siswa</h2>
+      
+      <div class="toolbar">
+        <input type="text" class="search-input" id="search-ts" placeholder="🔍 Cari nama siswa, NISN, kelas, atau jenis pembayaran..." oninput="renderTransaksiSiswa()">
+        <input type="date" class="date-input" id="from-ts" onchange="renderTransaksiSiswa()">
+        <input type="date" class="date-input" id="to-ts" onchange="renderTransaksiSiswa()">
+        <button class="btn-clear-filter" onclick="clearFilter('ts')">Reset Filter</button>
+      </div>
+
+      <div class="result-count" id="count-ts"></div>
+
+      <div class="table-responsive">
         <table>
           <thead>
             <tr>
               <th>Tanggal</th>
               <th>Siswa</th>
               <th>Kelas</th>
-              <th>Jenis Pembayaran</th>
+              <th>Pembayaran</th>
               <th>Nominal</th>
-              <th>Petugas</th>
+              <th>Admin</th>
               <th>Aksi</th>
             </tr>
           </thead>
-          <tbody id="tbody-transaksi-siswa"><tr><td colspan="7" style="text-align: center;">Memuat data...</td></tr></tbody>
+          <tbody id="tbody-transaksi-siswa">
+            <!-- Data akan dirender oleh JavaScript -->
+          </tbody>
         </table>
       </div>
     </div>
 
-    <!-- 2. TRANSAKSI INTERNAL -->
+    <!-- ========================================== -->
+    <!-- TAB TRANSAKSI INTERNAL                     -->
+    <!-- ========================================== -->
     <div id="transaksi-internal" class="page-section">
       <div class="card-section">
         <div class="section-header">
-          <h3>Pemasukan & Pengeluaran Internal</h3>
+          <h3>Data Transaksi Internal</h3>
           <div class="section-header-actions">
             <button class="btn-add" onclick="openModal('modal-transaksi-internal')">+ Tambah Transaksi</button>
           </div>
@@ -104,11 +108,42 @@
           <input type="date" class="date-input" id="to-ti" onchange="renderTransaksiInternal()">
           <button class="btn-clear-filter" onclick="clearFilter('ti')">Reset Filter</button>
         </div>
+
+        <!-- REVIEW PENCARIAN TRANSAKSI INTERNAL -->
+        <div class="info-cards" id="review-ti" style="display: none; margin-bottom: 15px;">
+          <div class="info-card success">
+            <h3>Pemasukan (Pencarian)</h3>
+            <div class="number" id="review-ti-masuk">Rp 0</div>
+          </div>
+          <div class="info-card danger">
+            <h3>Pengeluaran (Pencarian)</h3>
+            <div class="number" id="review-ti-keluar">Rp 0</div>
+          </div>
+          <div class="info-card">
+            <h3>Selisih</h3>
+            <div class="number" id="review-ti-selisih">Rp 0</div>
+          </div>
+        </div>
+
         <div class="result-count" id="count-ti"></div>
-        <table>
-          <thead><tr><th>Tanggal</th><th>Jenis</th><th>Keterangan</th><th>Nominal</th><th>Petugas</th><th>Aksi</th></tr></thead>
-          <tbody id="tbody-transaksi-internal"><tr><td colspan="6" style="text-align: center;">Memuat data...</td></tr></tbody>
-        </table>
+
+        <div class="table-responsive">
+          <table>
+            <thead>
+              <tr>
+                <th>Tanggal</th>
+                <th>Jenis</th>
+                <th>Keterangan</th>
+                <th>Nominal</th>
+                <th>Admin</th>
+                <th>Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="tbody-transaksi-internal">
+              <!-- Data akan dirender oleh JavaScript -->
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
 

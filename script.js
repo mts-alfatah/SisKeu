@@ -262,9 +262,16 @@ navItems.forEach(item => {
     e.preventDefault();
     navItems.forEach(nav => nav.classList.remove('active'));
     this.classList.add('active');
-    document.querySelectorAll('.page-section').forEach(section => section.classList.remove('active'));
+    document.querySelectorAll('.page-section, .tab-content').forEach(section => {
+      section.classList.remove('active');
+      section.style.display = 'none';
+    });
     const targetId = this.getAttribute('data-target');
-    document.getElementById(targetId)?.classList.add('active');
+    const targetElem = document.getElementById(targetId);
+    if (targetElem) {
+      targetElem.classList.add('active');
+      targetElem.style.display = 'block';
+    }
     if (pageTitleElem) pageTitleElem.textContent = this.textContent.replace(/[^a-zA-Z0-9 &]/g, '').trim();
     loadDataForSection(targetId);
   });
@@ -283,7 +290,7 @@ let rawTs = [], filteredTs = [], rawTi = [], filteredTi = [], rawTp = [], filter
 let tsModalSiswaList = [], tsModalTarifList = [];
 
 // ---------------------------------------------------
-// 2.1 TRANSAKSI SISWA
+// 2.1 TRANSAKSI SISWA (Tanpa Review/Kalkulasi Berat)
 // ---------------------------------------------------
 function loadTransaksiSiswa() {
   const tbody = document.getElementById('tbody-transaksi-siswa');
@@ -299,11 +306,13 @@ function renderTransaksiSiswa() {
   const tbody = document.getElementById('tbody-transaksi-siswa');
   if (!tbody) return;
   const q = (document.getElementById('search-ts')?.value || '').toLowerCase().trim();
+
   filteredTs = rawTs.filter(r => {
     const matchesSearch = !q || [r.nama, r.nisn, r.kelas, r.pembayaran].some(v => String(v || '').toLowerCase().includes(q));
     const matchesDate = inDateRange(r.tanggal, 'from-ts', 'to-ts');
     return matchesSearch && matchesDate;
   });
+
   document.getElementById('count-ts').textContent = `Menampilkan ${filteredTs.length} dari ${rawTs.length} transaksi`;
   if (filteredTs.length > 0) {
     tbody.innerHTML = filteredTs.map(r => `
@@ -419,12 +428,36 @@ function renderTransaksiInternal() {
   if (!tbody) return;
   const q = (document.getElementById('search-ti')?.value || '').toLowerCase().trim();
   const jenisFilter = document.getElementById('jenis-ti')?.value;
+  const fromDate = document.getElementById('from-ti')?.value;
+  const toDate = document.getElementById('to-ti')?.value;
+
   filteredTi = rawTi.filter(r => {
     const matchesSearch = !q || String(r.keterangan || '').toLowerCase().includes(q);
     const matchesJenis = !jenisFilter || r.jenis === jenisFilter;
     const matchesDate = inDateRange(r.tanggal, 'from-ti', 'to-ti');
     return matchesSearch && matchesJenis && matchesDate;
   });
+
+  const isFiltered = q || jenisFilter || fromDate || toDate;
+  const reviewContainer = document.getElementById('review-ti');
+  if (isFiltered) {
+    if (reviewContainer) reviewContainer.style.display = 'grid';
+    let pMasuk = 0, pKeluar = 0;
+    filteredTi.forEach(r => {
+      if (r.jenis === 'Pemasukan') pMasuk += parseFloat(r.nominal) || 0;
+      else pKeluar += parseFloat(r.nominal) || 0;
+    });
+    const masukEl = document.getElementById('review-ti-masuk');
+    const keluarEl = document.getElementById('review-ti-keluar');
+    const selisihEl = document.getElementById('review-ti-selisih');
+    
+    if (masukEl) masukEl.textContent = formatRp(pMasuk);
+    if (keluarEl) keluarEl.textContent = formatRp(pKeluar);
+    if (selisihEl) selisihEl.textContent = formatRp(pMasuk - pKeluar);
+  } else {
+    if (reviewContainer) reviewContainer.style.display = 'none';
+  }
+
   document.getElementById('count-ti').textContent = `Menampilkan ${filteredTi.length} dari ${rawTi.length} transaksi`;
   if (filteredTi.length > 0) {
     tbody.innerHTML = filteredTi.map(r => {
@@ -708,7 +741,7 @@ function exportLaporanExcel() {
   if (filteredLaporan.length === 0) return alert('Tidak ada data laporan untuk diekspor.');
   
   if (typeof XLSX === 'undefined') {
-    return alert('Library Excel (SheetJS) belum dimuat. Pastikan tag CDN XLSX sudah dipasang pada file HTML.');
+    return alert('Library Excel (SheetJS) belum dimuat.');
   }
 
   const dataForExcel = filteredLaporan.map((r, idx) => ({
@@ -732,7 +765,7 @@ function exportLaporanPDF() {
   if (filteredLaporan.length === 0) return alert('Tidak ada data laporan untuk diekspor.');
   
   if (!window.jspdf || !window.jspdf.jsPDF) {
-    return alert('Library PDF (jsPDF) belum dimuat. Pastikan tag CDN jsPDF sudah dipasang pada file HTML.');
+    return alert('Library PDF (jsPDF) belum dimuat.');
   }
 
   const { jsPDF } = window.jspdf;
