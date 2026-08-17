@@ -204,7 +204,7 @@ function toComparableDate(val) {
   if (!isNaN(d.getTime())) return d;
   const parts = String(val).split('/');
   if (parts.length === 3) {
-    const d2 = new Date(parts[2], parts[1] - 1, parts[0]);
+    const d2 = new Date(parts, parts - 1, parts[0]);
     if (!isNaN(d2.getTime())) return d2;
   }
   return null;
@@ -290,7 +290,7 @@ let rawTs = [], filteredTs = [], rawTi = [], filteredTi = [], rawTp = [], filter
 let tsModalSiswaList = [], tsModalTarifList = [];
 
 // ---------------------------------------------------
-// 2.1 TRANSAKSI SISWA (Tanpa Review/Kalkulasi Berat)
+// 2.1 TRANSAKSI SISWA (Tanpa Review/Kalkulasi Ringkasan)
 // ---------------------------------------------------
 function loadTransaksiSiswa() {
   const tbody = document.getElementById('tbody-transaksi-siswa');
@@ -363,7 +363,7 @@ document.getElementById('ts_siswaSelect')?.addEventListener('change', function()
     document.getElementById('ts_nominal').value = '';
     return;
   }
-  const siswaKelas = val.split('|')[2] || '';
+  const siswaKelas = val.split('|') || '';
   const filteredTarif = tsModalTarifList.filter(t => {
     const target = String(t.targetKelas || '').toLowerCase();
     return target.includes('semua') || target.includes(siswaKelas.toLowerCase());
@@ -411,7 +411,7 @@ function deleteTransaksiSiswa(sheetRow) {
 }
 
 // ---------------------------------------------------
-// 2.2 TRANSAKSI INTERNAL
+// 2.2 TRANSAKSI INTERNAL (Tanpa Review/Kalkulasi Ringkasan)
 // ---------------------------------------------------
 function loadTransaksiInternal() {
   const tbody = document.getElementById('tbody-transaksi-internal');
@@ -428,8 +428,6 @@ function renderTransaksiInternal() {
   if (!tbody) return;
   const q = (document.getElementById('search-ti')?.value || '').toLowerCase().trim();
   const jenisFilter = document.getElementById('jenis-ti')?.value;
-  const fromDate = document.getElementById('from-ti')?.value;
-  const toDate = document.getElementById('to-ti')?.value;
 
   filteredTi = rawTi.filter(r => {
     const matchesSearch = !q || String(r.keterangan || '').toLowerCase().includes(q);
@@ -437,26 +435,6 @@ function renderTransaksiInternal() {
     const matchesDate = inDateRange(r.tanggal, 'from-ti', 'to-ti');
     return matchesSearch && matchesJenis && matchesDate;
   });
-
-  const isFiltered = q || jenisFilter || fromDate || toDate;
-  const reviewContainer = document.getElementById('review-ti');
-  if (isFiltered) {
-    if (reviewContainer) reviewContainer.style.display = 'grid';
-    let pMasuk = 0, pKeluar = 0;
-    filteredTi.forEach(r => {
-      if (r.jenis === 'Pemasukan') pMasuk += parseFloat(r.nominal) || 0;
-      else pKeluar += parseFloat(r.nominal) || 0;
-    });
-    const masukEl = document.getElementById('review-ti-masuk');
-    const keluarEl = document.getElementById('review-ti-keluar');
-    const selisihEl = document.getElementById('review-ti-selisih');
-    
-    if (masukEl) masukEl.textContent = formatRp(pMasuk);
-    if (keluarEl) keluarEl.textContent = formatRp(pKeluar);
-    if (selisihEl) selisihEl.textContent = formatRp(pMasuk - pKeluar);
-  } else {
-    if (reviewContainer) reviewContainer.style.display = 'none';
-  }
 
   document.getElementById('count-ti').textContent = `Menampilkan ${filteredTi.length} dari ${rawTi.length} transaksi`;
   if (filteredTi.length > 0) {
@@ -816,8 +794,8 @@ document.getElementById('form-ts')?.addEventListener('submit', function(e) {
       action: sheetRow ? 'updateTransaksiSiswa' : 'addTransaksiSiswa',
       sheetRow: sheetRow,
       nisn: parts[0],
-      namaSiswa: parts[1],
-      kelas: parts[2] || '',
+      namaSiswa: parts,
+      kelas: parts || '',
       pembayaran: document.getElementById('ts_pembayaran').value,
       nominal: document.getElementById('ts_nominal').value,
       admin: session.nama
