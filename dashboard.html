@@ -52,7 +52,7 @@
     </div>
 
     <!-- ========================================== -->
-    <!-- TAB TRANSAKSI SISWA (Preview Dihilangkan)   -->
+    <!-- TAB TRANSAKSI SISWA                        -->
     <!-- ========================================== -->
     <div id="transaksi-siswa" class="tab-content active" style="display: block;">
       <h2>Data Transaksi Siswa</h2>
@@ -80,7 +80,7 @@
             </tr>
           </thead>
           <tbody id="tbody-transaksi-siswa">
-            <!-- Data akan dirender oleh JavaScript -->
+            <!-- Data dirender oleh JavaScript -->
           </tbody>
         </table>
       </div>
@@ -109,22 +109,6 @@
           <button class="btn-clear-filter" onclick="clearFilter('ti')">Reset Filter</button>
         </div>
 
-        <!-- REVIEW PENCARIAN TRANSAKSI INTERNAL -->
-        <div class="info-cards" id="review-ti" style="display: none; margin-bottom: 15px;">
-          <div class="info-card success">
-            <h3>Pemasukan (Pencarian)</h3>
-            <div class="number" id="review-ti-masuk">Rp 0</div>
-          </div>
-          <div class="info-card danger">
-            <h3>Pengeluaran (Pencarian)</h3>
-            <div class="number" id="review-ti-keluar">Rp 0</div>
-          </div>
-          <div class="info-card">
-            <h3>Selisih</h3>
-            <div class="number" id="review-ti-selisih">Rp 0</div>
-          </div>
-        </div>
-
         <div class="result-count" id="count-ti"></div>
 
         <div class="table-responsive">
@@ -140,14 +124,16 @@
               </tr>
             </thead>
             <tbody id="tbody-transaksi-internal">
-              <!-- Data akan dirender oleh JavaScript -->
+              <!-- Data dirender oleh JavaScript -->
             </tbody>
           </table>
         </div>
       </div>
     </div>
 
-    <!-- 3. JENIS & TARIF -->
+    <!-- ========================================== -->
+    <!-- TAB JENIS & TARIF                          -->
+    <!-- ========================================== -->
     <div id="jenis-pembayaran" class="page-section">
       <div class="card-section">
         <div class="section-header">
@@ -168,7 +154,9 @@
       </div>
     </div>
 
-    <!-- 4. MANAJEMEN AKUN -->
+    <!-- ========================================== -->
+    <!-- TAB MANAJEMEN AKUN                         -->
+    <!-- ========================================== -->
     <div id="manajemen-akun" class="page-section">
       <div class="card-section">
         <div class="section-header">
@@ -195,7 +183,9 @@
       </div>
     </div>
 
-    <!-- 5. LAPORAN TOTAL -->
+    <!-- ========================================== -->
+    <!-- TAB LAPORAN TOTAL                          -->
+    <!-- ========================================== -->
     <div id="laporan-total" class="page-section">
       <div class="info-cards">
         <div class="info-card success">
