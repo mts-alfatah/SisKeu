@@ -41,6 +41,14 @@ document.addEventListener('DOMContentLoaded', () => {
         sidebar.classList.remove('open');
       }
     });
+
+    document.querySelectorAll('.sidebar-menu li').forEach(item => {
+      item.addEventListener('click', () => {
+        if (sidebar.classList.contains('open')) {
+          sidebar.classList.remove('open');
+        }
+      });
+    });
   }
 
   // PWA Install Banner Handlers
