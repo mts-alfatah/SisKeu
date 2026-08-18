@@ -56,15 +56,15 @@ p.subtitle { margin: 5px 0 0 0; color: var(--text-muted); font-size: 13px; }
 
 .role-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; }
 .role-card { border: 2px solid var(--border-color); border-radius: 10px; padding: 12px 8px; text-align: center; cursor: pointer; transition: all 0.2s ease; background: #fff; }
-.role-card:hover { border-color: var(--primary-color); background: #f1f8ff; }
-.role-card.active { border-color: var(--primary-color); background: #e7f1ff; box-shadow: 0 0 0 2px rgba(13, 110, 253, 0.2); }
+.role-card:hover { border-color: var(--success-color); background: #eef7f2; }
+.role-card.active { border-color: var(--success-color); background: #d1e7dd; box-shadow: 0 0 0 2px rgba(25, 135, 84, 0.2); }
 .role-icon { font-size: 20px; margin-bottom: 4px; }
 .role-title { font-size: 12px; font-weight: 600; color: var(--text-main); }
 
 button.btn-login { 
-  width: 100%; padding: 12px; background-color: var(--primary-color); color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 15px; font-weight: 600; transition: background-color 0.2s; margin-top: 5px;
+  width: 100%; padding: 12px; background-color: var(--success-color); color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 15px; font-weight: 600; transition: background-color 0.2s; margin-top: 5px;
 }
-button.btn-login:hover { background-color: var(--primary-hover); }
+button.btn-login:hover { background-color: var(--success-hover); }
 button.btn-login:disabled { background-color: #adb5bd; cursor: not-allowed; }
 #message { margin-top: 15px; text-align: center; font-size: 13px; font-weight: 600; }
 
