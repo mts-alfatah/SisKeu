@@ -1878,3 +1878,19 @@ document.addEventListener('DOMContentLoaded', function () {
     loadTagihanSiswa();
   }
 });
+
+// ===================================================
+// TOGGLE PASSWORD VISIBILITY
+// ===================================================
+function togglePasswordVisibility(inputId, iconElement) {
+  const input = document.getElementById(inputId);
+  if (input) {
+    if (input.type === 'password') {
+      input.type = 'text';
+      iconElement.textContent = '🙈';
+    } else {
+      input.type = 'password';
+      iconElement.textContent = '👁️';
+    }
+  }
+}
