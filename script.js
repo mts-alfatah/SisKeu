@@ -13,12 +13,14 @@ if ('serviceWorker' in navigator) {
 let deferredPrompt;
 
 window.addEventListener('beforeinstallprompt', (e) => {
-  e.preventDefault();
-  deferredPrompt = e;
-
   const installBanner = document.getElementById('pwaInstallBanner');
-  if (installBanner && !sessionStorage.getItem('pwaBannerDismissed')) {
-    installBanner.style.display = 'flex';
+  if (installBanner) {
+    e.preventDefault();
+    deferredPrompt = e;
+
+    if (!sessionStorage.getItem('pwaBannerDismissed')) {
+      installBanner.style.display = 'flex';
+    }
   }
 });
 
