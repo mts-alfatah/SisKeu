@@ -83,7 +83,7 @@ window.addEventListener('appinstalled', () => {
 });
 
 // URL Google Apps Script
-const scriptURL = 'https://script.google.com/macros/s/AKfycbzneHDGHeaJrXWBbbGL4Vz_5LXp2hpU4kV3DGtDTWoErUCHBZ9wbTpZkOvO1dBodObPPA/exec';
+const scriptURL = 'https://script.google.com/macros/s/AKfycbyzV8nkEaO-kywXDnfXp1YOmxcRay0soyjJE2wSZHjUQUdjDEZYt41LcXOEDwnZllJikg/exec';
 
 // ===================================================
 // 1. LOGIKA HALAMAN LOGIN
